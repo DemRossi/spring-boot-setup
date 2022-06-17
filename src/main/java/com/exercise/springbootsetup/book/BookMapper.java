@@ -1,13 +1,9 @@
-package com.exercise.springbootsetup.mapper;
+package com.exercise.springbootsetup.book;
 
-import com.exercise.springbootsetup.models.internal.Author;
-import com.exercise.springbootsetup.models.internal.Book;
-import com.exercise.springbootsetup.models.internal.Category;
+import com.exercise.springbootsetup.author.Author;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class BookMapper {
@@ -32,24 +28,24 @@ public class BookMapper {
                     .map(Author::new)
                     .filter(author -> StringUtils.isNotBlank(author.getFullName()))
                     .collect(Collectors.toList()));
-            internalBook.setCategories(makeCategories(source));
+//            internalBook.setCategories(makeCategories(source));
         }
 
         return internalBook;
     }
 
-    private List<Category> makeCategories(com.exercise.springbootsetup.models.external.Book source){
-        List<String> strCategories = source.getCategories();
-        List<Category> categoryList = new ArrayList<>();
-
-        if (!strCategories.isEmpty()){
-            Category category = new Category();
-
-            for (String c : strCategories) {
-                category.setCategoryName(c);
-                categoryList.add(category);
-            }
-        }
-        return  categoryList;
-    }
+//    private List<Category> makeCategories(com.exercise.springbootsetup.models.external.Book source){
+//        List<String> strCategories = source.getCategories();
+//        List<Category> categoryList = new ArrayList<>();
+//
+//        if (!strCategories.isEmpty()){
+//            Category category = new Category();
+//
+//            for (String c : strCategories) {
+//                category.setCategoryName(c);
+//                categoryList.add(category);
+//            }
+//        }
+//        return  categoryList;
+//    }
 }
