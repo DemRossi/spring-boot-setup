@@ -1,23 +1,12 @@
 package com.exercise.springbootsetup.book;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
-
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
-@Service(" bookService")
-public class BookService {
-    private static final String JSON_PATH = "src/main/resources/files/books.json";
+public interface BookService {
+    List<Book> getBooksFromFile() throws IOException;
 
-    BookMapper bookMapper = new BookMapper();
+    List<Book> externalToInternalBooks(final List<com.exercise.springbootsetup.models.external.Book> source);
 
-    ObjectMapper mapper = new ObjectMapper();
-
-    public List<Book> getBooksFromFile() throws IOException {
-        return bookMapper.externalToInternalBooks(Arrays.asList(mapper.readValue(new FileReader(JSON_PATH), com.exercise.springbootsetup.models.external.Book[].class)));
-    }
-
+    Book externalToInternalBook(final com.exercise.springbootsetup.models.external.Book source);
 }

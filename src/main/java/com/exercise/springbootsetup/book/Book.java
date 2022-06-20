@@ -1,12 +1,10 @@
 package com.exercise.springbootsetup.book;
 
-import com.exercise.springbootsetup.author.Author;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -24,8 +22,8 @@ public class Book {
     private String longDescription;
     private String status;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<Author> authors;
+//    @ManyToMany(cascade = CascadeType.ALL)
+//    private List<Author> authors;
 
 //    @ManyToMany(cascade = CascadeType.ALL)
 //    private List<Category> categories;
@@ -39,7 +37,7 @@ public class Book {
                 ", publishedDate=" + publishedDate +
                 ", thumbnailUrl='" + thumbnailUrl + '\'' +
                 ", status='" + status + '\'' +
-                ", authors=" + authors +
+//                ", authors=" + authors +
 //                ", categories=" + categories +
                 '}';
     }

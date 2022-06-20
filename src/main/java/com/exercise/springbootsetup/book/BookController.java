@@ -1,34 +1,41 @@
 package com.exercise.springbootsetup.book;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/api")
 public class BookController {
     @Autowired
     private BookRepository bookRepository;
 
-    @GetMapping("/import-books")
+    @Autowired
+    private BookServiceImpl bookServiceImpl;
+
+    @PostMapping ("/import-books")
     public String saveBooks() throws Exception {
         // Import data: this case file -> could be api!
-        BookService bookService = new BookService();
-
-        bookRepository.saveAll(bookService.getBooksFromFile());
+        bookRepository.saveAll(bookServiceImpl.getBooksFromFile());
         return "Books are saved in DB!!!";
     }
 
-    @GetMapping("/get/book/{id}")
-    public Optional<Book> getBook(@PathVariable Long id) throws Exception {
-        return bookRepository.findById(id);
+    @GetMapping("/book")
+    public List<Book> getBooks(
+            @RequestParam(value = "sort", required = false) String sortDir
+    ) {
+        return StringUtils.isNotBlank(sortDir) ?
+                bookRepository.findAll(Sort.by(Sort.Direction.fromString(sortDir), "title")) :
+                bookRepository.findAll();
     }
 
-    @GetMapping("/get/books")
-    public List<Book> getBook() throws Exception {
-        return bookRepository.findAll();
+    @GetMapping("/book/{isbn}")
+    public Optional<Book> getBookByIsbn(@PathVariable String isbn) {
+        return bookRepository.findBookByIsbn(isbn);
     }
+
 }

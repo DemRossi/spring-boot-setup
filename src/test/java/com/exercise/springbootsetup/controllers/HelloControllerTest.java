@@ -31,11 +31,4 @@ public class HelloControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(equalTo("Hello World")));
     }
-
-    @Test
-    public void getBooks() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/import-books").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(394));
-    }
 }
