@@ -1,16 +1,22 @@
 package com.exercise.springbootsetup.book;
 
+import com.exercise.springbootsetup.author.Author;
+import com.exercise.springbootsetup.category.Category;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 public class Book {
@@ -28,11 +34,11 @@ public class Book {
     private String longDescription;
     private String status;
 
-//    @ManyToMany(cascade = CascadeType.ALL)
-//    private List<Author> authors;
+    @ManyToMany(cascade = CascadeType.ALL)
+    private Set<Author> authors;
 
-//    @ManyToMany(cascade = CascadeType.ALL)
-//    private List<Category> categories;
+    @ManyToMany(cascade = CascadeType.ALL)
+    private Set<Category> categories;
 
     @Override
     public String toString() {
@@ -43,8 +49,8 @@ public class Book {
                 ", publishedDate=" + publishedDate +
                 ", thumbnailUrl='" + thumbnailUrl + '\'' +
                 ", status='" + status + '\'' +
-//                ", authors=" + authors +
-//                ", categories=" + categories +
+                ", authors=" + authors +
+                ", categories=" + categories +
                 '}';
     }
 }

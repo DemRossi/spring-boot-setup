@@ -1,5 +1,8 @@
 package com.exercise.springbootsetup.book;
 
+import com.exercise.springbootsetup.author.Author;
+import com.exercise.springbootsetup.category.Category;
+import com.exercise.springbootsetup.exception.ServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -10,21 +13,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service(" bookService")
 public class BookServiceImpl implements BookService{
     @Autowired
     private BookRepository bookRepository;
+
+    Set<Author> authorSet = new HashSet<>();
+    Set<Category> categorySet = new HashSet<>();
 
     ObjectMapper mapper = JsonMapper.builder()
             .addModule(new ParameterNamesModule())
@@ -33,8 +38,15 @@ public class BookServiceImpl implements BookService{
             .build();
 
     @Override
-    public List<Book> getBooksFromFile(final String filePath) throws IOException {
-        return this.externalToInternalBooks(Arrays.asList(mapper.readValue(new FileReader(filePath), com.exercise.springbootsetup.models.external.Book[].class)));
+    public List<Book> getBooksFromFile(final String filePath) throws ServiceException {
+        try{
+            if (StringUtils.isBlank(filePath)){
+                throw new FileNotFoundException("No path given");
+            }
+            return this.externalToInternalBooks(Arrays.asList(mapper.readValue(new FileReader(filePath), com.exercise.springbootsetup.models.external.Book[].class)));
+        }catch (IOException e){
+            throw new ServiceException("Exception while retrieving books from file: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -56,23 +68,8 @@ public class BookServiceImpl implements BookService{
             internalBook.setShortDescription(source.getShortDescription());
             internalBook.setLongDescription(source.getLongDescription());
             internalBook.setStatus(source.getStatus());
-//            internalBook.setAuthors(source.getAuthors().stream()
-//                    .map(Author::new)
-//                    .filter(author -> StringUtils.isNotBlank(author.getFullName()))
-//                    .collect(Collectors.toList()));
-
-
-//            internalBook.setAuthors(source.getAuthors().stream()
-//                    .filter(author -> StringUtils.isNotBlank(author.getFullName()))
-//                    .sorted(Comparator.comparing(Author::getFullName))
-//                    .collect(Collectors.toCollection(LinkedList::new)));
-
-//            internalBook.setAuthors(findOrCreateAuthor(source.getAuthors().stream()
-//                    .map(AuthorDTO::new)// --> proper usage of a DTO??
-//                    .filter(author -> StringUtils.isNotBlank(author.getFullName()))
-//                    .collect(Collectors.toList())));
-
-//            internalBook.setCategories(makeCategories(source));
+            internalBook.setAuthors(getAuthor(source.getAuthors()));
+            internalBook.setCategories(getCategory(source.getCategories()));
         }
 
         return internalBook;
@@ -104,5 +101,47 @@ public class BookServiceImpl implements BookService{
         LocalDate localDate = LocalDate.parse(date, formatter);
 
         return localDate.atStartOfDay(ZoneId.systemDefault());
+    }
+
+    private Set<Author> getAuthor(List<String> authors){
+        Set<Author> bookAuthorSet = new HashSet<>();
+
+        if(authors != null){
+            for (String author : authors) {
+                if (authorSet.stream().anyMatch(author1 -> author1.getFullName().equals(author))){
+                    bookAuthorSet.add(authorSet.stream().filter(author1 -> author1.getFullName().equals(author)).findFirst().get());
+                }else {
+                    if (StringUtils.isNotBlank(author)){
+                        Author newAuthor = new Author(author);
+                        authorSet.add(newAuthor);
+
+                        bookAuthorSet.add(newAuthor);
+                    }
+                }
+            }
+        }
+
+        return bookAuthorSet;
+    }
+
+    private Set<Category> getCategory(List<String> categories){
+        Set<Category> bookCategorySet = new HashSet<>();
+
+        if(categories != null){
+            for (String category : categories) {
+                if (categorySet.stream().anyMatch(c-> c.getCategoryName().equals(category))){
+                    bookCategorySet.add(categorySet.stream().filter(c -> c.getCategoryName().equals(category)).findFirst().get());
+                }else {
+                    if (StringUtils.isNotBlank(category)){
+                        Category newCategory = new Category(category);
+                        categorySet.add(newCategory);
+
+                        bookCategorySet.add(newCategory);
+                    }
+                }
+            }
+        }
+
+        return bookCategorySet;
     }
 }

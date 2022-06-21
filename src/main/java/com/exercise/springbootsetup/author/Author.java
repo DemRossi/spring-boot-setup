@@ -3,15 +3,18 @@ package com.exercise.springbootsetup.author;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Setter
 @Entity
 public class Author {
+    public Author(){}
+
+    public Author(String fullName){
+        this.fullName = fullName;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,10 +22,17 @@ public class Author {
 
     private String fullName;
 
-    public Author(){}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Author)) return false;
+        Author author = (Author) o;
+        return fullName.equals(author.fullName);
+    }
 
-    public Author(String fullName){
-        this.fullName = fullName;
+    @Override
+    public int hashCode() {
+        return Objects.hash(fullName);
     }
 
     @Override

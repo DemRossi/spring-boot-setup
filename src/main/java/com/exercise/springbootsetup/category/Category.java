@@ -12,6 +12,13 @@ import javax.persistence.Id;
 @Setter
 @Entity
 public class Category {
+    public Category() {
+    }
+
+    public Category(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

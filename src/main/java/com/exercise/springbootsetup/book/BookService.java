@@ -1,11 +1,13 @@
 package com.exercise.springbootsetup.book;
 
+import com.exercise.springbootsetup.exception.ServiceException;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 public interface BookService {
-    List<Book> getBooksFromFile(final String filePath) throws IOException;
+    List<Book> getBooksFromFile(final String filePath) throws IOException, ServiceException;
 
     List<Book> externalToInternalBooks(final List<com.exercise.springbootsetup.models.external.Book> source);
 

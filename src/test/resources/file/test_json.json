@@ -1,0 +1,46 @@
+[
+  {
+    "title": "The Well-Grounded Rubyist, Second Edition",
+    "isbn": "1617291692",
+    "pageCount": 254,
+    "publishedDate": "2014-06-24T09:00:00.000+0200",
+    "thumbnailUrl": "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/black3.jpg",
+    "shortDescription": null,
+    "longDescription": null,
+    "status": "PUBLISH"
+  },
+  {
+    "title": "Ember.js in Action",
+    "isbn": "1617291455",
+    "pageCount": 567,
+    "publishedDate": "2014-06-10T09:00:00.000+0200",
+    "thumbnailUrl": "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/skeie.jpg",
+    "shortDescription": null,
+    "longDescription": null,
+    "status": "PUBLISH"
+  },
+  {
+    "title": "Coffeehouse",
+    "isbn": "1884777384",
+    "pageCount": 316,
+    "publishedDate": "1997-07-01T00:00:00.000-0700",
+    "thumbnailUrl": "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/asher.jpg",
+    "shortDescription": "Coffeehouse is an anthology of stories, poems and essays originally published on the World Wide Web.",
+    "longDescription": "Coffeehouse is an anthology of stories, poems and essays originally published on the World Wide Web. The purpose is to capture the zeitgeist of the web's creative community, and to give readers a chance to enjoy some of the best and most notable original works that have appeared in this form. It showcases over forty individual web writers, among them Joseph Squier, Martha Conway, Jason Snell, David Alexander, Carl Steadman and Walter Miller. The intent is to show the variety and vitality of the web's blossoming literary \"scene,\" and to capture the unique and highly iconoclastic \"personality\" of the web community.",
+    "status": "PUBLISH",
+    "authors": ["Levi Asher", "Christian Crumlish"],
+    "categories": ["Miscellaneous"]
+  },
+  {
+    "title": "Jaguar Development with PowerBuilder 7",
+    "isbn": "1884777864",
+    "pageCount": 550,
+    "publishedDate": "1999-08-01T00:00:00.000-0700",
+    "thumbnailUrl": "https://s3.amazonaws.com/AKIAJC5RLADLUMVRPFDQ.book-thumb-images/barlotta2.jpg",
+    "shortDescription": "Jaguar Development with PowerBuilder 7 is the definitive guide to distributed application development with PowerBuilder. It is the only book dedicated to preparing PowerBuilder developers for Jaguar applications and has been approved by Sybase engineers and product specialists who build the tools described in the book.",
+    "longDescription": "Jaguar Development with PowerBuilder 7 is the definitive guide to distributed application development with PowerBuilder. It is the only book dedicated to preparing PowerBuilder developers for Jaguar applications and has been approved by Sybase engineers and product specialists who build the tools described in the book.    Jaguar Development with PowerBuilder 7 focuses on getting you up to speed on Jaguar and PowerBuilder, and it is packed with code samples to guide you every step of the way. It covers each step involved in application development, from setting up the development environment to deploying a production application.    Even a PowerBuilder developer with no experience in distributed technologies or Jaguar CTS will learn what it takes to build an application. Jaguar Development with PowerBuilder 7 covers:    Developing Component-centric Applications  Building Jaguar CTS Components/Clients  CORBA  Adaptive SQL Anywhere  Adaptive Server Enterprise  and lots more!",
+    "status": "PUBLISH",
+    "authors": ["Michael Barlotta"],
+    "categories": ["PowerBuilder", "Client-Server"]
+  }
+]
