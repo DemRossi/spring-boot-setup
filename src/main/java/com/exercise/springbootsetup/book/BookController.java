@@ -30,19 +30,6 @@ public class BookController {
         return bookServiceImpl.getBooks(sortDir, date);
     }
 
-//    @GetMapping("/book/date")
-//    public Optional<List<Book>> getBooksAfterPublishedDate(
-//            @RequestParam(value = "publishedAfter", required = false) String date
-//    ) {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//        LocalDate localDate = LocalDate.parse(date, formatter);
-//
-//        ZonedDateTime publishedAfter = localDate.atStartOfDay(ZoneId.systemDefault());
-//
-//        return bookRepository.findAllByPublishedDateAfter(publishedAfter);
-//
-//    }
-
     @GetMapping("/book/{isbn}")
     public Optional<Book> getBookByIsbn(@PathVariable String isbn) {
         return bookRepository.findBookByIsbn(isbn);

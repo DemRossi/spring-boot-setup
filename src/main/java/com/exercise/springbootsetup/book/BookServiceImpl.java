@@ -86,22 +86,25 @@ public class BookServiceImpl implements BookService{
 
         if (StringUtils.isNotBlank(sortDir) && StringUtils.isNotBlank(publishedAfter)){
             // only published after date, sorted by title ASC|DESC
-            requestResult = Optional.empty();
+            requestResult = bookRepository.findAllByPublishedDateAfter(createZonedDateTime(publishedAfter), Sort.by(Sort.Direction.fromString(sortDir), "title"));;
         }else if(StringUtils.isNotBlank(sortDir) && StringUtils.isBlank(publishedAfter)){
             // getAll sorted by title ASC|DESC
             requestResult =  Optional.of(bookRepository.findAll(Sort.by(Sort.Direction.fromString(sortDir), "title")));
         } else if (StringUtils.isBlank(sortDir) && StringUtils.isNotBlank(publishedAfter)) {
             // only published after date
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            LocalDate localDate = LocalDate.parse(publishedAfter, formatter);
-            ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
-
-            requestResult =  bookRepository.findAllByPublishedDateAfter(zonedDateTime);
+            requestResult =  bookRepository.findAllByPublishedDateAfter(createZonedDateTime(publishedAfter));
         }else{
             // getAll
             requestResult = Optional.of(bookRepository.findAll());
         }
 
         return requestResult;
+    }
+
+    private ZonedDateTime createZonedDateTime(final String date){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
+
+        return localDate.atStartOfDay(ZoneId.systemDefault());
     }
 }
