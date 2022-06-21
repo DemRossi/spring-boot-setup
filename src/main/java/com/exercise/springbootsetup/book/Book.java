@@ -1,10 +1,14 @@
 package com.exercise.springbootsetup.book;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.time.ZonedDateTime;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,7 +20,9 @@ public class Book {
     private String title;
     private String isbn;
     private int pageCount;
-    private Date publishedDate;
+
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    private ZonedDateTime publishedDate;
     private String thumbnailUrl;
     private String shortDescription;
     private String longDescription;

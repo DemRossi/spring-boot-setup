@@ -1,9 +1,10 @@
 package com.exercise.springbootsetup.models.external;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Data
@@ -12,7 +13,10 @@ public class Book {
     private String title;
     private String isbn;
     private int pageCount;
-    private Date publishedDate;
+
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    private ZonedDateTime publishedDate;
+
     private String thumbnailUrl;
     private String shortDescription;
     private String longDescription;
