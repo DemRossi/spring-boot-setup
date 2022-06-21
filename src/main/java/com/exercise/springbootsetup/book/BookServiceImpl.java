@@ -5,13 +5,20 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service(" bookService")
@@ -71,5 +78,30 @@ public class BookServiceImpl implements BookService{
         }
 
         return internalBook;
+    }
+
+    @Override
+    public Optional<List<Book>> getBooks(String sortDir, String publishedAfter) {
+        Optional<List<Book>> requestResult;
+
+        if (StringUtils.isNotBlank(sortDir) && StringUtils.isNotBlank(publishedAfter)){
+            // only published after date, sorted by title ASC|DESC
+            requestResult = Optional.empty();
+        }else if(StringUtils.isNotBlank(sortDir) && StringUtils.isBlank(publishedAfter)){
+            // getAll sorted by title ASC|DESC
+            requestResult =  Optional.of(bookRepository.findAll(Sort.by(Sort.Direction.fromString(sortDir), "title")));
+        } else if (StringUtils.isBlank(sortDir) && StringUtils.isNotBlank(publishedAfter)) {
+            // only published after date
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse(publishedAfter, formatter);
+            ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
+
+            requestResult =  bookRepository.findAllByPublishedDateAfter(zonedDateTime);
+        }else{
+            // getAll
+            requestResult = Optional.of(bookRepository.findAll());
+        }
+
+        return requestResult;
     }
 }
