@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 
 @Service(" bookService")
 public class BookServiceImpl implements BookService{
-    private static final String JSON_PATH = "src/main/resources/files/books.json";
-
     @Autowired
     private BookRepository bookRepository;
 
@@ -35,8 +33,8 @@ public class BookServiceImpl implements BookService{
             .build();
 
     @Override
-    public List<Book> getBooksFromFile() throws IOException {
-        return this.externalToInternalBooks(Arrays.asList(mapper.readValue(new FileReader(JSON_PATH), com.exercise.springbootsetup.models.external.Book[].class)));
+    public List<Book> getBooksFromFile(final String filePath) throws IOException {
+        return this.externalToInternalBooks(Arrays.asList(mapper.readValue(new FileReader(filePath), com.exercise.springbootsetup.models.external.Book[].class)));
     }
 
     @Override
@@ -86,7 +84,7 @@ public class BookServiceImpl implements BookService{
 
         if (StringUtils.isNotBlank(sortDir) && StringUtils.isNotBlank(publishedAfter)){
             // only published after date, sorted by title ASC|DESC
-            requestResult = bookRepository.findAllByPublishedDateAfter(createZonedDateTime(publishedAfter), Sort.by(Sort.Direction.fromString(sortDir), "title"));;
+            requestResult = bookRepository.findAllByPublishedDateAfter(createZonedDateTime(publishedAfter), Sort.by(Sort.Direction.fromString(sortDir), "title"));
         }else if(StringUtils.isNotBlank(sortDir) && StringUtils.isBlank(publishedAfter)){
             // getAll sorted by title ASC|DESC
             requestResult =  Optional.of(bookRepository.findAll(Sort.by(Sort.Direction.fromString(sortDir), "title")));

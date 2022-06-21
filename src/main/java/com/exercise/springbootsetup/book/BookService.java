@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookService {
-    List<Book> getBooksFromFile() throws IOException;
+    List<Book> getBooksFromFile(final String filePath) throws IOException;
 
     List<Book> externalToInternalBooks(final List<com.exercise.springbootsetup.models.external.Book> source);
 

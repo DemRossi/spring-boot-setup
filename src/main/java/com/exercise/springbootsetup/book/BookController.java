@@ -18,7 +18,9 @@ public class BookController {
     @PostMapping ("/import-books")
     public String saveBooks() throws Exception {
         // Import data: this case file -> could be api!
-        bookRepository.saveAll(bookServiceImpl.getBooksFromFile());
+        final String JSON_PATH = "src/main/resources/files/books.json";
+
+        bookRepository.saveAll(bookServiceImpl.getBooksFromFile(JSON_PATH));
         return "Books are saved in DB!!!";
     }
 
