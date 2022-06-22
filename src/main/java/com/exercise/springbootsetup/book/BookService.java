@@ -9,6 +9,10 @@ import java.util.Optional;
 public interface BookService {
     List<Book> getBooksFromFile(final String filePath) throws IOException, ServiceException;
 
+    List<Book> saveAll(String filePath) throws ServiceException;
+
+    Optional<Book> findBookByIsbn(String isbn);
+
     List<Book> externalToInternalBooks(final List<com.exercise.springbootsetup.models.external.Book> source);
 
     Book externalToInternalBook(final com.exercise.springbootsetup.models.external.Book source);

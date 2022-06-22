@@ -96,11 +96,21 @@ public class BookServiceImpl implements BookService{
         return requestResult;
     }
 
+    @Override
+    public List<Book> saveAll( String filePath) throws ServiceException {
+        return bookRepository.saveAll(this.getBooksFromFile(filePath));
+    }
+
     private ZonedDateTime createZonedDateTime(final String date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate localDate = LocalDate.parse(date, formatter);
 
         return localDate.atStartOfDay(ZoneId.systemDefault());
+    }
+
+    @Override
+    public Optional<Book> findBookByIsbn(String isbn) {
+        return bookRepository.findBookByIsbn(isbn);
     }
 
     private Set<Author> getAuthor(List<String> authors){

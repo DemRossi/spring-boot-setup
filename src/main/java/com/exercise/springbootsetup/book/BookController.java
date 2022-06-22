@@ -10,18 +10,14 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class BookController {
     @Autowired
-    private BookRepository bookRepository;
+    private BookServiceImpl bookService;
 
-    @Autowired
-    private BookServiceImpl bookServiceImpl;
-
-    //TODO: Move all calls to service layer -> no repository calls here
     @PostMapping ("/import-books")
     public String saveBooks() throws Exception {
         // Import data: this case file -> could be api!
         final String JSON_PATH = "src/main/resources/files/books.json";
+        bookService.saveAll(JSON_PATH);
 
-        bookRepository.saveAll(bookServiceImpl.getBooksFromFile(JSON_PATH));
         return "Books are saved in DB!!!";
     }
 
@@ -30,12 +26,12 @@ public class BookController {
             @RequestParam(value = "sort", required = false) String sortDir,
             @RequestParam(value = "publishedAfter", required = false) String date
     ) {
-        return bookServiceImpl.getBooks(sortDir, date);
+        return bookService.getBooks(sortDir, date);
     }
 
     @GetMapping("/book/{isbn}")
     public Optional<Book> getBookByIsbn(@PathVariable String isbn) {
-        return bookRepository.findBookByIsbn(isbn);
+        return bookService.findBookByIsbn(isbn);
     }
 
 }
