@@ -13,16 +13,12 @@ public class BookController {
     @Autowired
     private BookServiceImpl bookService;
 
-    @PostMapping ("/import-books")
+    @GetMapping ("/import-books")
     public String saveBooks() throws ServiceException {
         // Import data: this case file -> could be api!
         final String JSON_PATH = "src/main/resources/files/books.json";
-//        try{
-            bookService.saveAll(JSON_PATH);
-            return "Books are saved in DB!!!";
-//        }catch (){
-//
-//        }
+        bookService.saveAll(JSON_PATH);
+        return "Books are saved in DB!!!";
     }
 
     @GetMapping("/book")
