@@ -2,6 +2,8 @@ package com.exercise.springbootsetup.book;
 
 import com.exercise.springbootsetup.exception.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,11 +16,11 @@ public class BookController {
     private BookServiceImpl bookService;
 
     @GetMapping ("/import-books")
-    public String saveBooks() throws ServiceException {
+    public ResponseEntity<List<Book>> saveBooks() throws ServiceException {
         // Import data: this case file -> could be api!
         final String JSON_PATH = "src/main/resources/files/books.json";
-        bookService.saveAll(JSON_PATH);
-        return "Books are saved in DB!!!";
+        List<Book> books = bookService.saveAll(JSON_PATH);
+        return new ResponseEntity<>(books, HttpStatus.CREATED);
     }
 
     @GetMapping("/book")
