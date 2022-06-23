@@ -115,8 +115,12 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public Optional<Book> findBookByIsbn(String isbn) {
-        return bookRepository.findBookByIsbn(isbn);
+    public Optional<Book> findBookByIsbn(String isbn) throws ServiceException{
+        Optional<Book> book = bookRepository.findBookByIsbn(isbn);
+        if(book.isEmpty()){
+            throw new ServiceException("Book not found: Check the ISBN, if correct the book doesn't exist in our DB");
+        }
+        return book;
     }
 
     private Set<Author> getAuthor(List<String> authors){
