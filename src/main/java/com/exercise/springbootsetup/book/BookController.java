@@ -24,16 +24,16 @@ public class BookController {
     }
 
     @GetMapping("/book")
-    public Optional<List<Book>> getBooks(
+    public ResponseEntity<Optional<List<Book>>> getBooks(
             @RequestParam(value = "sort", required = false) String sortDir,
             @RequestParam(value = "publishedAfter", required = false) String date
     ) throws ServiceException {
-        return bookService.getBooks(sortDir, date);
+        return new ResponseEntity<>(bookService.getBooks(sortDir, date), HttpStatus.OK);
     }
 
     @GetMapping("/book/{isbn}")
-    public Optional<Book> getBookByIsbn(@PathVariable String isbn) {
-        return bookService.findBookByIsbn(isbn);
+    public ResponseEntity<Optional<Book>> getBookByIsbn(@PathVariable String isbn) throws ServiceException {
+        return new ResponseEntity<>(bookService.findBookByIsbn(isbn), HttpStatus.OK);
     }
 
 }

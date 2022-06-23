@@ -1,108 +1,131 @@
 package com.exercise.springbootsetup.book;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import com.exercise.springbootsetup.AbstractTest;
+import com.exercise.springbootsetup.exception.ServiceException;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class BookControllerTest {
+@ExtendWith(MockitoExtension.class)
+class BookControllerTest extends AbstractTest {
 
-    @Autowired
-    private MockMvc mvc;
+    @Override
+    @Before
+    public void setUp() {
+        super.setUp();
+    }
+
+    @MockBean
+    private BookRepository bookRepository;
+
+    @Mock
+    private BookServiceImpl bookService;
+
+    @InjectMocks
+    private BookController bookController;
 
     @Test
-    @Order(1)
-    public void saveBooks() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.post("/api/import-books").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("Books are saved in DB!!!"));
+    public void saveBooks() throws ServiceException {
+        ResponseEntity<List<Book>> savedBooksResponse = bookController.saveBooks();
+
+        int content = savedBooksResponse.getStatusCodeValue();
+
+        assertThat(content).isNotNull();
+        assertThat(content).isEqualTo(201);
+        assertThat(savedBooksResponse.getBody()).isNotNull();
     }
 
     @Test
-    @Order(2)
-    void test_get_books() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/api/book").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(394))
-                .andExpect(jsonPath("$[0].id").value(1));
+    public void getBooks() throws Exception {
+        String uri = "/api/book";
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON)).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        assertThat(status).isEqualTo(200);
     }
 
     @Test
-    @Order(3)
-    void test_get_books_sort_by_title_desc() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/api/book?sort=desc").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(394))
-                .andExpect(jsonPath("$[0].id").value(207))
-                .andExpect(jsonPath("$[0].title").value("wxPython in Action"));
+    public void getBooks_sort_by_title_asc() throws Exception {
+        String uri = "/api/book?sort=asc";
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON)).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        assertThat(status).isEqualTo(200);
     }
 
     @Test
-    @Order(4)
-    void test_get_books_sort_by_title_asc() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/api/book?sort=asc").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(394))
-                .andExpect(jsonPath("$[0].id").value(62))
-                .andExpect(jsonPath("$[0].title").value(".NET Multithreading"));
+    public void getBooks_sort_by_title_desc() throws Exception {
+        String uri = "/api/book?sort=desc";
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON)).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        assertThat(status).isEqualTo(200);
     }
 
     @Test
-    @Order(5)
-    void test_get_books_after_date() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/api/book?publishedAfter=2014-06-03").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(348))
-                .andExpect(jsonPath("$[0].title").value("Ember.js in Action"))
-                .andExpect(jsonPath("$[0].publishedDate").value("2014-06-10T09:00:00.000+0200"));
+    public void getBooks_sort_by_title_wrong_sort() throws Exception {
+        String uri = "/api/book?sort=jef";
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON)).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        String content = mvcResult.getResponse().getContentAsString();
+
+        assertThat(status).isEqualTo(400);
+        assertThat(content).contains("Exception while getting books: Can only use asc or desc for sorting");
     }
 
     @Test
-    @Order(6)
-    void test_get_books_after_date_sort_by_title_desc() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/api/book?publishedAfter=2014-06-03&sort=desc").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(363))
-                .andExpect(jsonPath("$[0].title").value("The Well-Grounded Rubyist, Second Edition"))
-                .andExpect(jsonPath("$[0].publishedDate").value("2014-06-24T09:00:00.000+0200"))
-                .andExpect(jsonPath("$[1].id").value(348))
-                .andExpect(jsonPath("$[1].title").value("Ember.js in Action"))
-                .andExpect(jsonPath("$[1].publishedDate").value("2014-06-10T09:00:00.000+0200"));
+    public void getBooks_after_published_date() throws Exception {
+        String uri = "/api/book?publishedAfter=2014-06-03";
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON)).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        assertThat(status).isEqualTo(200);
     }
 
     @Test
-    @Order(7)
-    void test_get_books_after_date_sort_by_title_asc() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/api/book?publishedAfter=2014-06-03&sort=asc").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(348))
-                .andExpect(jsonPath("$[0].title").value("Ember.js in Action"))
-                .andExpect(jsonPath("$[0].publishedDate").value("2014-06-10T09:00:00.000+0200"))
-                .andExpect(jsonPath("$[1].id").value(363))
-                .andExpect(jsonPath("$[1].title").value("The Well-Grounded Rubyist, Second Edition"))
-                .andExpect(jsonPath("$[1].publishedDate").value("2014-06-24T09:00:00.000+0200"));
+    public void getBooks_after_published_date_wrong_input() throws Exception {
+        String uri = "/api/book?publishedAfter=qwerty";
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON)).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+        String content = mvcResult.getResponse().getContentAsString();
+
+        assertThat(status).isEqualTo(400);
+        assertThat(content).contains("Exception while getting books: Something is wrong with the date format");
     }
 
     @Test
-    @Order(8)
-    void test_get_book_by_isbn() throws Exception {
-        mvc.perform(MockMvcRequestBuilders.get("/api/book/1932394613").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(51))
-                .andExpect(jsonPath("$.title").value("Ajax in Action"));
+    public void getBooks_after_published_date_sort_by_title_asc() throws Exception {
+        String uri = "/api/book?publishedAfter=2014-06-03&sort=asc";
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
+                .accept(MediaType.APPLICATION_JSON)).andReturn();
+
+        int status = mvcResult.getResponse().getStatus();
+
+        assertThat(status).isEqualTo(200);
     }
+
 }
