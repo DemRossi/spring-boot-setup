@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.GenericValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -76,36 +77,41 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public Optional<List<Book>> getBooks(String sortDir, String publishedAfter) {
+    public Optional<List<Book>> getBooks(String sortDir, String publishedAfter) throws ServiceException{
         Optional<List<Book>> requestResult;
 
-        if (StringUtils.isNotBlank(sortDir) && StringUtils.isNotBlank(publishedAfter)){
-            // only published after date, sorted by title ASC|DESC
-            requestResult = bookRepository.findAllByPublishedDateAfter(createZonedDateTime(publishedAfter), Sort.by(Sort.Direction.fromString(sortDir), "title"));
-        }else if(StringUtils.isNotBlank(sortDir) && StringUtils.isBlank(publishedAfter)){
-            // getAll sorted by title ASC|DESC
-            requestResult =  Optional.of(bookRepository.findAll(Sort.by(Sort.Direction.fromString(sortDir), "title")));
-        } else if (StringUtils.isBlank(sortDir) && StringUtils.isNotBlank(publishedAfter)) {
-            // only published after date
-            requestResult =  bookRepository.findAllByPublishedDateAfter(createZonedDateTime(publishedAfter));
-        }else{
-            // getAll
-            requestResult = Optional.of(bookRepository.findAll());
-        }
+        try {
+            if (StringUtils.isNotBlank(sortDir) && !StringUtils.equalsAnyIgnoreCase(sortDir, "asc", "desc")) {
+                throw new IllegalArgumentException("Can only use asc or desc for sorting");
+            }
+            if (StringUtils.isNotBlank(publishedAfter) && !GenericValidator.isDate(publishedAfter,"yyyy-MM-dd", true)){
+                throw new IllegalArgumentException("Something is wrong with the date format");
+            }
 
-        return requestResult;
+            if (StringUtils.isNotBlank(sortDir) && StringUtils.isNotBlank(publishedAfter)){
+                // only published after date, sorted by title ASC|DESC
+                requestResult = bookRepository.findAllByPublishedDateAfter(createZonedDateTime(publishedAfter), Sort.by(Sort.Direction.fromString(sortDir), "title"));
+            }else if(StringUtils.isNotBlank(sortDir) && StringUtils.isBlank(publishedAfter)){
+                // getAll sorted by title ASC|DESC
+                requestResult =  Optional.of(bookRepository.findAll(Sort.by(Sort.Direction.fromString(sortDir), "title")));
+            } else if (StringUtils.isBlank(sortDir) && StringUtils.isNotBlank(publishedAfter)) {
+                // only published after date
+                requestResult =  bookRepository.findAllByPublishedDateAfter(createZonedDateTime(publishedAfter));
+            }else{
+                // getAll
+                requestResult = Optional.of(bookRepository.findAll());
+            }
+
+            return requestResult;
+        }catch (Exception e){
+            throw new ServiceException("Exception while getting books: " + e.getMessage(), e);
+
+        }
     }
 
     @Override
     public List<Book> saveAll( String filePath) throws ServiceException {
         return bookRepository.saveAll(this.getBooksFromFile(filePath));
-    }
-
-    private ZonedDateTime createZonedDateTime(final String date){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
-
-        return localDate.atStartOfDay(ZoneId.systemDefault());
     }
 
     @Override
@@ -155,5 +161,12 @@ public class BookServiceImpl implements BookService{
         }
 
         return bookCategorySet;
+    }
+
+    private ZonedDateTime createZonedDateTime(final String date){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
+
+        return localDate.atStartOfDay(ZoneId.systemDefault());
     }
 }

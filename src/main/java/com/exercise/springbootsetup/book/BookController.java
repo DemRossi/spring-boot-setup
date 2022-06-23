@@ -27,7 +27,7 @@ public class BookController {
     public Optional<List<Book>> getBooks(
             @RequestParam(value = "sort", required = false) String sortDir,
             @RequestParam(value = "publishedAfter", required = false) String date
-    ) {
+    ) throws ServiceException {
         return bookService.getBooks(sortDir, date);
     }
 

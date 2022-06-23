@@ -17,5 +17,5 @@ public interface BookService {
 
     Book externalToInternalBook(final com.exercise.springbootsetup.models.external.Book source);
 
-    Optional<List<Book>> getBooks(String sortDir, String publishedAfter);
+    Optional<List<Book>> getBooks(String sortDir, String publishedAfter) throws ServiceException;
 }
