@@ -68,8 +68,8 @@ public class BookServiceImpl implements BookService{
             internalBook.setShortDescription(source.getShortDescription());
             internalBook.setLongDescription(source.getLongDescription());
             internalBook.setStatus(source.getStatus());
-            internalBook.setAuthors(getAuthor(source.getAuthors()));
-            internalBook.setCategories(getCategory(source.getCategories()));
+            internalBook.setAuthor(getAuthor(source.getAuthors()));
+            internalBook.setCategory(getCategory(source.getCategories()));
         }
 
         return internalBook;
@@ -118,8 +118,9 @@ public class BookServiceImpl implements BookService{
 
         if(authors != null){
             for (String author : authors) {
-                if (authorSet.stream().anyMatch(author1 -> author1.getFullName().equals(author))){
-                    bookAuthorSet.add(authorSet.stream().filter(author1 -> author1.getFullName().equals(author)).findFirst().get());
+                Optional<Author> possibleAuthor = authorSet.stream().filter(author1 -> author1.getFullName().equals(author)).findFirst();
+                if (possibleAuthor.isPresent()){
+                    bookAuthorSet.add(possibleAuthor.get());
                 }else {
                     if (StringUtils.isNotBlank(author)){
                         Author newAuthor = new Author(author);
@@ -139,8 +140,9 @@ public class BookServiceImpl implements BookService{
 
         if(categories != null){
             for (String category : categories) {
-                if (categorySet.stream().anyMatch(c-> c.getCategoryName().equals(category))){
-                    bookCategorySet.add(categorySet.stream().filter(c -> c.getCategoryName().equals(category)).findFirst().get());
+                Optional<Category> possibleCategory = categorySet.stream().filter(c -> c.getCategoryName().equals(category)).findFirst();
+                if (possibleCategory.isPresent()){
+                    bookCategorySet.add(possibleCategory.get());
                 }else {
                     if (StringUtils.isNotBlank(category)){
                         Category newCategory = new Category(category);

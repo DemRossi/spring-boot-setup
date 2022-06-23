@@ -21,7 +21,8 @@ import java.util.Set;
 @Entity
 public class Book {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "id_Sequence")
+    @SequenceGenerator(name = "id_Sequence", sequenceName = "ID_SEQ")
     private Long id;
     private String title;
     private String isbn;
@@ -35,10 +36,13 @@ public class Book {
     private String status;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    private Set<Author> authors;
+    @JoinTable(name = "book_author",
+            joinColumns = { @JoinColumn(name = "book_id") },
+            inverseJoinColumns = { @JoinColumn(name = "author_id") })
+    private Set<Author> author;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    private Set<Category> categories;
+    private Set<Category> category;
 
     @Override
     public String toString() {
@@ -49,8 +53,8 @@ public class Book {
                 ", publishedDate=" + publishedDate +
                 ", thumbnailUrl='" + thumbnailUrl + '\'' +
                 ", status='" + status + '\'' +
-                ", authors=" + authors +
-                ", categories=" + categories +
+                ", authors=" + author +
+                ", categories=" + category +
                 '}';
     }
 }
