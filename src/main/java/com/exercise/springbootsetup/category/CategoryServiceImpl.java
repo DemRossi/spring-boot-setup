@@ -1,6 +1,5 @@
 package com.exercise.springbootsetup.category;
 
-import com.exercise.springbootsetup.bookAuthor.BookAuthor;
 import com.exercise.springbootsetup.bookCategory.BookCategory;
 import com.exercise.springbootsetup.bookCategory.BookCategoryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
