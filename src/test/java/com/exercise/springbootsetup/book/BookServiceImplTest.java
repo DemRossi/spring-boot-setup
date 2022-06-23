@@ -105,28 +105,52 @@ class BookServiceImplTest {
 
 
     @Test
-    void getBooks_both_params_null() {
+    void getBooks_both_params_null() throws ServiceException {
         Optional<List<Book>> getBooks = bookService.getBooks(null, null);
 
         assertThat(getBooks).isNotNull();
     }
 
     @Test
-    void getBooks_sortDir_filled_in() {
+    void getBooks_sortDir_filled_in() throws ServiceException {
         Optional<List<Book>> getBooks = bookService.getBooks("asc", null);
 
         assertThat(getBooks).isNotNull();
     }
 
     @Test
-    void getBooks_date_filled_in() {
+    void getBooks_sortDir_filled_in_wrong() {
+        Exception exception = assertThrows(ServiceException.class, () -> {
+            Optional<List<Book>> getBooks = bookService.getBooks("qwerty", null);
+        });
+
+        String expectedMessage = "Can only use asc or desc for sorting";
+        String actualMessage = exception.getMessage();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void getBooks_date_filled_in() throws ServiceException {
         Optional<List<Book>> getBooks = bookService.getBooks(null, "2014-06-03");
 
         assertThat(getBooks).isNotNull();
     }
 
     @Test
-    void getBooks_both_filled_in() {
+    void getBooks_date_filled_in_wrong() {
+        Exception exception = assertThrows(ServiceException.class, () -> {
+            Optional<List<Book>> getBooks = bookService.getBooks( null, "qwerty");
+        });
+
+        String expectedMessage = "Something is wrong with the date format";
+        String actualMessage = exception.getMessage();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void getBooks_both_filled_in() throws ServiceException {
         Optional<List<Book>> getBooks = bookService.getBooks("asc", "2014-06-03");
 
         assertThat(getBooks).isNotNull();
