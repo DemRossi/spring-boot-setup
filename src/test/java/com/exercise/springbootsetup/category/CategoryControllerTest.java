@@ -1,6 +1,8 @@
-package com.exercise.springbootsetup.author;
+package com.exercise.springbootsetup.category;
 
 import com.exercise.springbootsetup.AbstractTest;
+import com.exercise.springbootsetup.author.AuthorController;
+import com.exercise.springbootsetup.author.AuthorServiceImpl;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
-class AuthorControllerTest extends AbstractTest {
+class CategoryControllerTest extends AbstractTest {
     @Override
     @Before
     public void setUp() {
@@ -27,14 +29,14 @@ class AuthorControllerTest extends AbstractTest {
     }
 
     @Mock
-    private AuthorServiceImpl authorService;
+    private CategoryServiceImpl categoryService;
 
     @InjectMocks
-    private AuthorController authorController;
+    private CategoryController categoryController;
 
     @Test
     void getAuthorsWithAmountOfBooks() throws Exception {
-        String uri = "/api/author";
+        String uri = "/api/category";
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
                 .accept(MediaType.APPLICATION_JSON)).andReturn();
 
