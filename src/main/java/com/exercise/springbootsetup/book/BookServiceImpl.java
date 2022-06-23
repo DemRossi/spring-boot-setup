@@ -128,7 +128,7 @@ public class BookServiceImpl implements BookService{
 
         if(authors != null){
             for (String author : authors) {
-                Optional<Author> possibleAuthor = authorSet.stream().filter(author1 -> author1.getFullName().equals(author)).findFirst();
+                Optional<Author> possibleAuthor = authorSet.stream().filter(author1 -> author1.getFullName().equalsIgnoreCase(author)).findFirst();
                 if (possibleAuthor.isPresent()){
                     bookAuthorSet.add(possibleAuthor.get());
                 }else {
@@ -150,12 +150,12 @@ public class BookServiceImpl implements BookService{
 
         if(categories != null){
             for (String category : categories) {
-                Optional<Category> possibleCategory = categorySet.stream().filter(c -> c.getCategoryName().equals(category)).findFirst();
+                Optional<Category> possibleCategory = categorySet.stream().filter(c -> c.getCategoryName().equalsIgnoreCase(category)).findFirst();
                 if (possibleCategory.isPresent()){
                     bookCategorySet.add(possibleCategory.get());
                 }else {
                     if (StringUtils.isNotBlank(category)){
-                        Category newCategory = new Category(category);
+                        Category newCategory = new Category(StringUtils.capitalize(category));
                         categorySet.add(newCategory);
 
                         bookCategorySet.add(newCategory);
