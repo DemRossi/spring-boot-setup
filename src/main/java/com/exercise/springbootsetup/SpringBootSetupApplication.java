@@ -1,6 +1,5 @@
 package com.exercise.springbootsetup;
 
-import com.exercise.springbootsetup.controllers.HelloController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -13,7 +12,7 @@ import java.util.Arrays;
 
 @SpringBootApplication
 public class SpringBootSetupApplication {
-	private static final Logger log = LoggerFactory.getLogger(HelloController.class);
+	private static final Logger log = LoggerFactory.getLogger(SpringBootSetupApplication.class);
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootSetupApplication.class, args);
