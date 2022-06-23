@@ -1,4 +1,4 @@
-package com.exercise.springbootsetup.book_authors;
+package com.exercise.springbootsetup.bookAuthor;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

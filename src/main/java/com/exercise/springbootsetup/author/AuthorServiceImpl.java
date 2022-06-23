@@ -1,8 +1,7 @@
 package com.exercise.springbootsetup.author;
 
-import com.exercise.springbootsetup.book_authors.BookAuthor;
-import com.exercise.springbootsetup.book_authors.BookAuthorRepository;
-import com.exercise.springbootsetup.book_authors.BookAuthorServiceImpl;
+import com.exercise.springbootsetup.bookAuthor.BookAuthor;
+import com.exercise.springbootsetup.bookAuthor.BookAuthorServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

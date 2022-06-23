@@ -14,7 +14,7 @@ public class AuthorController {
     @Autowired
     private AuthorServiceImpl authorService;
 
-    @GetMapping("/authors")
+    @GetMapping("/author")
     public Map<String, Long> getAuthorsWithAmountOfBooks(){
         return authorService.getAuthorsWithAmountOfBooks();
     }
