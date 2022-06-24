@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -18,6 +19,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceImplTest {
@@ -31,6 +35,8 @@ class BookServiceImplTest {
 
     BookServiceImplTest() {
     }
+
+    // TODO: Verify gebruiken
 
     @Test
     void getBooksFromFile() throws ServiceException {
@@ -61,6 +67,19 @@ class BookServiceImplTest {
         String actualMessage = exception.getMessage();
 
         Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void saveAll() throws ServiceException {
+        List<Book> savedBooks = bookService.saveAll(JSON_PATH);
+
+        verify(bookRepository, times(1)).saveAll(bookService.getBooksFromFile(JSON_PATH));
+    }
+
+    @Test
+    void findBookByIsbn(){
+        Optional<Book> book = bookRepository.findBookByIsbn("1234567890");
+        verify(bookRepository, times(1)).findBookByIsbn("1234567890");
     }
 
     @Test
@@ -107,13 +126,15 @@ class BookServiceImplTest {
         Optional<List<Book>> getBooks = bookService.getBooks(null, null);
 
         assertThat(getBooks).isNotNull();
+        verify(bookRepository, times(1)).findAll();
     }
 
     @Test
     void getBooks_sortDir_filled_in() throws ServiceException {
-        Optional<List<Book>> getBooks = bookService.getBooks("asc", null);
+        Optional<List<Book>> getBooks = bookService.getBooks(Sort.Direction.ASC.name() , null);
 
         assertThat(getBooks).isNotNull();
+        verify(bookRepository, times(1)).findAll(Sort.by(Sort.Direction.ASC, "title"));
     }
 
     @Test
@@ -133,6 +154,7 @@ class BookServiceImplTest {
         Optional<List<Book>> getBooks = bookService.getBooks(null, "2014-06-03");
 
         assertThat(getBooks).isNotNull();
+        verify(bookRepository, times(1)).findAllByPublishedDateAfter(createZonedDateTime("2014-06-03"));
     }
 
     @Test
@@ -149,9 +171,10 @@ class BookServiceImplTest {
 
     @Test
     void getBooks_both_filled_in() throws ServiceException {
-        Optional<List<Book>> getBooks = bookService.getBooks("asc", "2014-06-03");
+        Optional<List<Book>> getBooks = bookService.getBooks(Sort.Direction.ASC.name(), "2014-06-03");
 
         assertThat(getBooks).isNotNull();
+        verify(bookRepository, times(1)).findAllByPublishedDateAfter(createZonedDateTime("2014-06-03"), Sort.by(Sort.Direction.fromString("asc"), "title"));
     }
 
 

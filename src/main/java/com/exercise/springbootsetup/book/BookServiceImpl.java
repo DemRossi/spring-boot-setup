@@ -87,7 +87,7 @@ public class BookServiceImpl implements BookService{
             if (StringUtils.isNotBlank(publishedAfter) && !GenericValidator.isDate(publishedAfter,"yyyy-MM-dd", true)){
                 throw new IllegalArgumentException("Something is wrong with the date format");
             }
-
+            // TODO: refactor to filterObject (of query object)
             if (StringUtils.isNotBlank(sortDir) && StringUtils.isNotBlank(publishedAfter)){
                 // only published after date, sorted by title ASC|DESC
                 requestResult = bookRepository.findAllByPublishedDateAfter(createZonedDateTime(publishedAfter), Sort.by(Sort.Direction.fromString(sortDir), "title"));
