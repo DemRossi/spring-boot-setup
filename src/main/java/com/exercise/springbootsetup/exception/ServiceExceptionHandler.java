@@ -17,8 +17,8 @@ public class ServiceExceptionHandler {
         HttpStatus badRequest = HttpStatus.BAD_REQUEST;
 
         ServiceExceptionPayload serviceExceptionPayload = new ServiceExceptionPayload(
-                e.getMessage(),
                 badRequest,
+                e.getMessage(),
                 ZonedDateTime.now(ZoneId.of("Z"))
         );
         // return response entity
