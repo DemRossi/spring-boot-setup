@@ -1,6 +1,7 @@
 package com.exercise.springbootsetup.book;
 
 import com.exercise.springbootsetup.exception.ServiceException;
+import com.exercise.springbootsetup.query.Query;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,5 +18,5 @@ public interface BookService {
 
     Book externalToInternalBook(final com.exercise.springbootsetup.models.external.Book source);
 
-    Optional<List<Book>> getBooks(String sortDir, String publishedAfter) throws ServiceException;
+    Optional<List<Book>> getBooks(Query filter) throws ServiceException;
 }

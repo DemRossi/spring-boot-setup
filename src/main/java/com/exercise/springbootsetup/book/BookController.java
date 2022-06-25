@@ -1,6 +1,8 @@
 package com.exercise.springbootsetup.book;
 
 import com.exercise.springbootsetup.exception.ServiceException;
+import com.exercise.springbootsetup.query.Query;
+import com.exercise.springbootsetup.query.QueryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,9 @@ public class BookController {
     @Autowired
     private BookServiceImpl bookService;
 
+    @Autowired
+    private QueryServiceImpl queryService;
+
     @GetMapping ("/import-books")
     public ResponseEntity<List<Book>> saveBooks() throws ServiceException {
         // Import data: this case file -> could be api!
@@ -28,12 +33,20 @@ public class BookController {
             @RequestParam(value = "sort", required = false) String sortDir,
             @RequestParam(value = "publishedAfter", required = false) String date
     ) throws ServiceException {
-        return new ResponseEntity<>(bookService.getBooks(sortDir, date), HttpStatus.OK);
+        // Make query Object
+        Query filter = Query.builder()
+                .sortDir(queryService.createSort(sortDir))
+                .publishedAfter(queryService.createZonedDateTime(date))
+                .build();
+        // give QueryObj to service
+        // check in service if object is right
+        // if right give to repository, else error
+        // in repository make sql query based on non-null members of queryObj
+        return new ResponseEntity<>(bookService.getBooks(filter), HttpStatus.OK);
     }
 
     @GetMapping("/book/{isbn}")
     public ResponseEntity<Optional<Book>> getBookByIsbn(@PathVariable String isbn) throws ServiceException {
         return new ResponseEntity<>(bookService.findBookByIsbn(isbn), HttpStatus.OK);
     }
-
 }
