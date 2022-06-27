@@ -28,6 +28,8 @@ import static org.mockito.Mockito.*;
 class BookServiceImplTest {
     final static String JSON_PATH = "src/test/resources/file/test_json.json";
     final String DATE = "2011-04-01";
+    final String ZONED_DATE = "2011-04-01T00:00+02:00[Europe/Paris]";
+
 
     @Mock
     private BookRepository bookRepository;
@@ -180,7 +182,7 @@ class BookServiceImplTest {
     @Test
     void getBooks_date_filled_in() throws ServiceException {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]"));
+        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse(ZONED_DATE));
 
         Query filter = Query.builder()
                 .sortDir(null)
@@ -194,7 +196,7 @@ class BookServiceImplTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly( null,ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]") );
+                .containsExactly( null,ZonedDateTime.parse(ZONED_DATE) );
     }
 
     @Test
@@ -212,7 +214,7 @@ class BookServiceImplTest {
     void getBooks_both_filled_in() throws ServiceException {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
         when(queryService.createSort("asc")).thenReturn("ASC");
-        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]"));
+        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse(ZONED_DATE));
 
         Query filter = Query.builder()
                 .sortDir(queryService.createSort("asc"))
@@ -226,7 +228,7 @@ class BookServiceImplTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly("ASC", ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]"));
+                .containsExactly("ASC", ZonedDateTime.parse(ZONED_DATE));
     }
 
 

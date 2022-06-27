@@ -33,6 +33,7 @@ class BookControllerTest extends AbstractTest {
     final String SORT_DIR_WRONG = "JEFF";
     final String DATE = "2011-04-01";
     final String NOT_DATE = "qwerty";
+    final String ZONED_DATE = "2011-04-01T00:00+02:00[Europe/Paris]";
 
     @Override
     @Before
@@ -153,7 +154,7 @@ class BookControllerTest extends AbstractTest {
     public void getBooks_after_published_date() throws Exception {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
         when(queryService.createSort(null)).thenReturn(null);
-        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]"));
+        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse(ZONED_DATE));
 
         String uri = "/api/book?publishedAfter=2011-04-01";
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
@@ -166,7 +167,7 @@ class BookControllerTest extends AbstractTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly(null, ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]"));
+                .containsExactly(null, ZonedDateTime.parse(ZONED_DATE));
         assertThat(status).isEqualTo(200);
     }
 
@@ -191,7 +192,7 @@ class BookControllerTest extends AbstractTest {
     public void getBooks_after_published_date_sort_by_title_asc() throws Exception {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
         when(queryService.createSort("asc")).thenReturn("ASC");
-        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]"));
+        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse(ZONED_DATE));
 
         String uri = "/api/book?publishedAfter=2014-06-03&sort=asc";
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
@@ -204,7 +205,7 @@ class BookControllerTest extends AbstractTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly("ASC", ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]"));
+                .containsExactly("ASC", ZonedDateTime.parse(ZONED_DATE));
         assertThat(status).isEqualTo(200);
     }
 
