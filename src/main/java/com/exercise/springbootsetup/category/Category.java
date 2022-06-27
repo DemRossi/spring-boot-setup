@@ -22,12 +22,4 @@ public class Category {
     private Long id;
 
     private String categoryName;
-
-    @Override
-    public String toString() {
-        return "Category{" +
-                "id=" + id +
-                ", categoryName='" + categoryName + '\'' +
-                '}';
-    }
 }
