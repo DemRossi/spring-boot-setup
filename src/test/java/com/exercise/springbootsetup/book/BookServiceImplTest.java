@@ -1,13 +1,15 @@
 package com.exercise.springbootsetup.book;
 
 import com.exercise.springbootsetup.exception.ServiceException;
+import com.exercise.springbootsetup.query.Query;
+import com.exercise.springbootsetup.query.QueryServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -19,19 +21,22 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceImplTest {
     final static String JSON_PATH = "src/test/resources/file/test_json.json";
+    final String DATE = "2011-04-01";
 
     @Mock
-    BookRepository bookRepository;
+    private BookRepository bookRepository;
+
+    @Mock
+    private QueryServiceImpl queryService;
 
     @InjectMocks
-    BookServiceImpl bookService;
+    private BookServiceImpl bookService;
 
     BookServiceImplTest() {
     }
@@ -123,58 +128,105 @@ class BookServiceImplTest {
 
     @Test
     void getBooks_both_params_null() throws ServiceException {
-        Optional<List<Book>> getBooks = bookService.getBooks(null, null);
+        ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+
+        Query filter = Query.builder()
+                .sortDir(queryService.createSort(null))
+                .publishedAfter(queryService.createZonedDateTime(null))
+                .build();
+
+        Optional<List<Book>> getBooks = bookService.getBooks(filter);
 
         assertThat(getBooks).isNotNull();
-        verify(bookRepository, times(1)).findAll();
+        verify(bookRepository, times(1)).getBooks(queryCaptor.capture());
+        assertThat(queryCaptor.getValue())
+                .isNotNull()
+                .extracting(Query::getSortDir, Query::getPublishedAfter)
+                .containsExactly(null, null);
     }
 
     @Test
     void getBooks_sortDir_filled_in() throws ServiceException {
-        Optional<List<Book>> getBooks = bookService.getBooks(Sort.Direction.ASC.name() , null);
+        ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+        when(queryService.createSort("asc")).thenReturn("ASC");
+
+        Query filter = Query.builder()
+                .sortDir(queryService.createSort("asc"))
+                .publishedAfter(null)
+                .build();
+
+        Optional<List<Book>> getBooks = bookService.getBooks(filter);
 
         assertThat(getBooks).isNotNull();
-        verify(bookRepository, times(1)).findAll(Sort.by(Sort.Direction.ASC, "title"));
+        verify(bookRepository, times(1)).getBooks(queryCaptor.capture());
+        assertThat(queryCaptor.getValue())
+                .isNotNull()
+                .extracting(Query::getSortDir, Query::getPublishedAfter)
+                .containsExactly("ASC", null);
     }
 
     @Test
-    void getBooks_sortDir_filled_in_wrong() {
-        Exception exception = assertThrows(ServiceException.class, () -> {
-            Optional<List<Book>> getBooks = bookService.getBooks("qwerty", null);
-        });
+    void getBooks_sortDir_filled_in_wrong() throws ServiceException {
+        Query filter = Query.builder()
+                .sortDir(queryService.createSort("qwerty"))
+                .publishedAfter(queryService.createZonedDateTime(null))
+                .build();
 
-        String expectedMessage = "Can only use asc or desc for sorting";
-        String actualMessage = exception.getMessage();
+        Optional<List<Book>> getBooks = bookService.getBooks(filter);
 
-        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+        assertThat(getBooks).isEmpty();
     }
 
     @Test
     void getBooks_date_filled_in() throws ServiceException {
-        Optional<List<Book>> getBooks = bookService.getBooks(null, "2014-06-03");
+        ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]"));
+
+        Query filter = Query.builder()
+                .sortDir(null)
+                .publishedAfter(queryService.createZonedDateTime(DATE))
+                .build();
+
+        Optional<List<Book>> getBooks = bookService.getBooks(filter);
 
         assertThat(getBooks).isNotNull();
-        verify(bookRepository, times(1)).findAllByPublishedDateAfter(createZonedDateTime("2014-06-03"));
+        verify(bookRepository, times(1)).getBooks(queryCaptor.capture());
+        assertThat(queryCaptor.getValue())
+                .isNotNull()
+                .extracting(Query::getSortDir, Query::getPublishedAfter)
+                .containsExactly( null,ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]") );
     }
 
     @Test
-    void getBooks_date_filled_in_wrong() {
-        Exception exception = assertThrows(ServiceException.class, () -> {
-            Optional<List<Book>> getBooks = bookService.getBooks( null, "qwerty");
-        });
+    void getBooks_date_filled_in_wrong() throws ServiceException {
+        Query filter = Query.builder()
+                .sortDir(queryService.createSort(null))
+                .publishedAfter(queryService.createZonedDateTime("qwerty"))
+                .build();
 
-        String expectedMessage = "Something is wrong with the date format";
-        String actualMessage = exception.getMessage();
-
-        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+        Optional<List<Book>> getBooks = bookService.getBooks( filter);
+        assertThat(getBooks).isEmpty();
     }
 
     @Test
     void getBooks_both_filled_in() throws ServiceException {
-        Optional<List<Book>> getBooks = bookService.getBooks(Sort.Direction.ASC.name(), "2014-06-03");
+        ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+        when(queryService.createSort("asc")).thenReturn("ASC");
+        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]"));
+
+        Query filter = Query.builder()
+                .sortDir(queryService.createSort("asc"))
+                .publishedAfter(queryService.createZonedDateTime(DATE))
+                .build();
+
+        Optional<List<Book>> getBooks = bookService.getBooks(filter);
 
         assertThat(getBooks).isNotNull();
-        verify(bookRepository, times(1)).findAllByPublishedDateAfter(createZonedDateTime("2014-06-03"), Sort.by(Sort.Direction.fromString("asc"), "title"));
+        verify(bookRepository, times(1)).getBooks(queryCaptor.capture());
+        assertThat(queryCaptor.getValue())
+                .isNotNull()
+                .extracting(Query::getSortDir, Query::getPublishedAfter)
+                .containsExactly("ASC", ZonedDateTime.parse("2011-04-01T00:00+02:00[Europe/Paris]"));
     }
 
 
