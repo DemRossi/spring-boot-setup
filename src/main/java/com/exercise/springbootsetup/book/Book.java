@@ -5,7 +5,6 @@ import com.exercise.springbootsetup.category.Category;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +13,6 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -43,18 +41,4 @@ public class Book {
 
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<Category> category;
-
-    @Override
-    public String toString() {
-        return "Book{" +
-                "title='" + title + '\'' +
-                ", isbn='" + isbn + '\'' +
-                ", pageCount=" + pageCount +
-                ", publishedDate=" + publishedDate +
-                ", thumbnailUrl='" + thumbnailUrl + '\'' +
-                ", status='" + status + '\'' +
-                ", authors=" + author +
-                ", categories=" + category +
-                '}';
-    }
 }
