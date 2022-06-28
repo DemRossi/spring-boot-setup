@@ -10,11 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -103,45 +98,6 @@ class BookServiceImplTest {
 
         verify(bookRepository, times(1)).findBookByIsbn(filter.getIsbn());
     }
-
-    @Test
-    void externalToInternalBooks() {
-        List<com.exercise.springbootsetup.models.external.Book> externalBookList = new ArrayList<>();
-        com.exercise.springbootsetup.models.external.Book book1 = new com.exercise.springbootsetup.models.external.Book();
-        book1.setIsbn("1234567890");
-        book1.setTitle("Dit is een titel");
-        book1.setPageCount(123);
-        book1.setPublishedDate(createZonedDateTime("2014-04-01"));
-
-        com.exercise.springbootsetup.models.external.Book book2 = new com.exercise.springbootsetup.models.external.Book();
-        book2.setIsbn("0987654321");
-        book2.setTitle("Dit is een andere titel");
-        book2.setPageCount(456);
-        book2.setPublishedDate(createZonedDateTime("2011-01-11"));
-
-        externalBookList.add(book1);
-        externalBookList.add(book2);
-
-        List<Book> internalBookList = bookService.externalToInternalBooks(externalBookList);
-
-        assertThat(internalBookList).isNotNull();
-        assertThat(internalBookList.size()).isEqualTo(2);
-
-    }
-
-    @Test
-    void externalToInternalBook() {
-        com.exercise.springbootsetup.models.external.Book externalBook = new com.exercise.springbootsetup.models.external.Book();
-        externalBook.setIsbn("1234567890");
-        externalBook.setTitle("Dit is een titel");
-        externalBook.setPageCount(123);
-        externalBook.setPublishedDate(createZonedDateTime("2014-04-01"));
-
-        Book internalBook = bookService.externalToInternalBook(externalBook);
-
-        assertThat(internalBook.getIsbn()).isEqualTo("1234567890");
-    }
-
 
     @Test
     void getBooks_both_params_null() throws ServiceException {
@@ -305,12 +261,5 @@ class BookServiceImplTest {
         String actualMessage = exception.getMessage();
 
         Assertions.assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    private ZonedDateTime createZonedDateTime(final String date){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate localDate = LocalDate.parse(date, formatter);
-
-        return localDate.atStartOfDay(ZoneId.systemDefault());
     }
 }

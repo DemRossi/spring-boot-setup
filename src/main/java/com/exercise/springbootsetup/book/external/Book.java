@@ -1,4 +1,4 @@
-package com.exercise.springbootsetup.models.external;
+package com.exercise.springbootsetup.book.external;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

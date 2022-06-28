@@ -14,10 +14,6 @@ public interface BookService {
 
     Optional<Book> findBookByIsbn(Query filter) throws ServiceException;
 
-    List<Book> externalToInternalBooks(final List<com.exercise.springbootsetup.models.external.Book> source);
-
-    Book externalToInternalBook(final com.exercise.springbootsetup.models.external.Book source);
-
     Optional<List<Book>> getBooks(Query filter) throws ServiceException;
 
     Book save(Book book) throws ServiceException;
