@@ -47,6 +47,10 @@ public class BookController {
 
     @GetMapping("/book/{isbn}")
     public ResponseEntity<Optional<Book>> getBookByIsbn(@PathVariable String isbn) throws ServiceException {
-        return new ResponseEntity<>(bookService.findBookByIsbn(isbn), HttpStatus.OK);
+        // TODO: met Query Object - DONE
+        Query filter = Query.builder()
+                .isbn(isbn)
+                .build();
+        return new ResponseEntity<>(bookService.findBookByIsbn(filter), HttpStatus.OK);
     }
 }

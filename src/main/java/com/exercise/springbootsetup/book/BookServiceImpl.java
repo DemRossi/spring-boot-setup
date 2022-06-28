@@ -86,8 +86,8 @@ public class BookServiceImpl implements BookService{
 
 
     @Override
-    public Optional<Book> findBookByIsbn(String isbn) throws ServiceException{
-        Optional<Book> book = bookRepository.findBookByIsbn(isbn);
+    public Optional<Book> findBookByIsbn(Query filter) throws ServiceException{
+        Optional<Book> book = bookRepository.findBookByIsbn(filter.getIsbn());
         if(book.isEmpty()){
             throw new ServiceException("Book not found: Check the ISBN, if correct the book doesn't exist in our DB");
         }
