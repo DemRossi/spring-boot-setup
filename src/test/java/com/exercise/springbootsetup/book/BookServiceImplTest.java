@@ -2,7 +2,6 @@ package com.exercise.springbootsetup.book;
 
 import com.exercise.springbootsetup.exception.ServiceException;
 import com.exercise.springbootsetup.query.Query;
-import com.exercise.springbootsetup.query.QueryServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,21 +19,17 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
-
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceImplTest {
     final static String JSON_PATH = "src/test/resources/file/test_json.json";
     final String DATE = "2011-04-01";
-    final String ZONED_DATE = "2011-04-01T00:00+02:00[Europe/Paris]";
 
     @Mock
     private BookRepository bookRepository;
-
-    @Mock
-    private QueryServiceImpl queryService;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -153,8 +148,8 @@ class BookServiceImplTest {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
 
         Query filter = Query.builder()
-                .sortDir(queryService.createSort(null))
-                .publishedAfter(queryService.createZonedDateTime(null))
+                .sortDir(null)
+                .publishedAfter(null)
                 .build();
 
         Optional<List<Book>> getBooks = bookService.getBooks(filter);
@@ -170,10 +165,9 @@ class BookServiceImplTest {
     @Test
     void getBooks_sortDir_filled_in() throws ServiceException {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-        when(queryService.createSort("asc")).thenReturn("ASC");
 
         Query filter = Query.builder()
-                .sortDir(queryService.createSort("asc"))
+                .sortDir("asc")
                 .publishedAfter(null)
                 .build();
 
@@ -184,14 +178,14 @@ class BookServiceImplTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly("ASC", null);
+                .containsExactly("asc", null);
     }
 
     @Test
     void getBooks_sortDir_filled_in_wrong() throws ServiceException {
         Query filter = Query.builder()
-                .sortDir(queryService.createSort("qwerty"))
-                .publishedAfter(queryService.createZonedDateTime(null))
+                .sortDir("qwerty")
+                .publishedAfter(null)
                 .build();
 
         Optional<List<Book>> getBooks = bookService.getBooks(filter);
@@ -202,11 +196,10 @@ class BookServiceImplTest {
     @Test
     void getBooks_date_filled_in() throws ServiceException {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse(ZONED_DATE));
 
         Query filter = Query.builder()
                 .sortDir(null)
-                .publishedAfter(queryService.createZonedDateTime(DATE))
+                .publishedAfter(DATE)
                 .build();
 
         Optional<List<Book>> getBooks = bookService.getBooks(filter);
@@ -216,14 +209,14 @@ class BookServiceImplTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly( null,ZonedDateTime.parse(ZONED_DATE) );
+                .containsExactly( null, DATE);
     }
 
     @Test
     void getBooks_date_filled_in_wrong() throws ServiceException {
         Query filter = Query.builder()
-                .sortDir(queryService.createSort(null))
-                .publishedAfter(queryService.createZonedDateTime("qwerty"))
+                .sortDir(null)
+                .publishedAfter("qwerty")
                 .build();
 
         Optional<List<Book>> getBooks = bookService.getBooks( filter);
@@ -233,12 +226,10 @@ class BookServiceImplTest {
     @Test
     void getBooks_both_filled_in() throws ServiceException {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-        when(queryService.createSort("asc")).thenReturn("ASC");
-        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse(ZONED_DATE));
 
         Query filter = Query.builder()
-                .sortDir(queryService.createSort("asc"))
-                .publishedAfter(queryService.createZonedDateTime(DATE))
+                .sortDir("asc")
+                .publishedAfter(DATE)
                 .build();
 
         Optional<List<Book>> getBooks = bookService.getBooks(filter);
@@ -248,9 +239,73 @@ class BookServiceImplTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly("ASC", ZonedDateTime.parse(ZONED_DATE));
+                .containsExactly("asc", DATE);
     }
 
+    @Test
+    void validate_nothing_filled_in_expect_no_error() {
+        Query filter = mock(Query.class);
+
+        assertDoesNotThrow(() -> bookService.validate(filter));
+    }
+
+    @Test
+    void validate_all_correctly_filled_in_expect_no_error() {
+        Query filter = mock(Query.class);
+
+        when(filter.getSortDir()).thenReturn("asc");
+        when(filter.getPublishedAfter()).thenReturn(DATE);
+
+        assertDoesNotThrow(() -> bookService.validate(filter));
+    }
+
+    @Test
+    void validate_sort_direction_filled_in_expect_no_error() {
+        Query filter = mock(Query.class);
+
+        when(filter.getSortDir()).thenReturn("asc");
+
+        assertDoesNotThrow(() -> bookService.validate(filter));
+    }
+
+    @Test
+    void validate_date_filled_in_expect_no_error() {
+        Query filter = mock(Query.class);
+
+        when(filter.getPublishedAfter()).thenReturn(DATE);
+
+        assertDoesNotThrow(() -> bookService.validate(filter));
+    }
+
+    @Test
+    void validate_wrong_sort_direction_filled_in_expect_error() {
+        Query filter = mock(Query.class);
+        when(filter.getSortDir()).thenReturn("jef");
+
+        Exception exception = assertThrows(ServiceException.class, () ->
+            bookService.validate(filter)
+        );
+
+        String expectedMessage = "Sort parameter can only be asc or desc";
+        String actualMessage = exception.getMessage();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void validate_wrong_date_filled_in_expect_error() {
+        Query filter = mock(Query.class);
+        when(filter.getPublishedAfter()).thenReturn("qwerty");
+
+        Exception exception = assertThrows(ServiceException.class, () ->
+            bookService.validate(filter)
+        );
+
+        String expectedMessage = "Something is wrong with the date format";
+        String actualMessage = exception.getMessage();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
 
     private ZonedDateTime createZonedDateTime(final String date){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

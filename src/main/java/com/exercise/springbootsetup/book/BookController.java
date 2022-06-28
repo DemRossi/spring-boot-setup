@@ -2,12 +2,12 @@ package com.exercise.springbootsetup.book;
 
 import com.exercise.springbootsetup.exception.ServiceException;
 import com.exercise.springbootsetup.query.Query;
-import com.exercise.springbootsetup.query.QueryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,9 +16,6 @@ import java.util.Optional;
 public class BookController {
     @Autowired
     private BookServiceImpl bookService;
-
-    @Autowired
-    private QueryServiceImpl queryService;
 
     @GetMapping ("/import-books")
     public ResponseEntity<List<Book>> saveBooks() throws ServiceException {
@@ -33,16 +30,28 @@ public class BookController {
             @RequestParam(value = "sort", required = false) String sortDir,
             @RequestParam(value = "publishedAfter", required = false) String date
     ) throws ServiceException {
-        // Make query Object
         Query filter = Query.builder()
-                .sortDir(queryService.createSort(sortDir))
-                .publishedAfter(queryService.createZonedDateTime(date))
+                .sortDir(sortDir)
+                .publishedAfter(date)
                 .build();
-        // give QueryObj to service
-        // check in service if object is right
-        // if right give to repository, else error
-        // in repository make sql query based on non-null members of queryObj
+        bookService.validate(filter);
         return new ResponseEntity<>(bookService.getBooks(filter), HttpStatus.OK);
+    }
+
+    @PostMapping("/book")
+    public ResponseEntity<Book> saveBook( @RequestBody Book book ){
+        // TODO: met Query Object??
+        //TODO: check if author exist, yes -> use author, no -> make author. Idem categories
+        Book newBook = bookService.save(book);
+        return ResponseEntity.created(URI.create(String.format("/book/%s", book.getIsbn())))
+                .body(newBook);
+    }
+
+    @DeleteMapping("/book/{id}")
+    public ResponseEntity<String>  deleteBook(@PathVariable Long id) {
+        // TODO: met Query Object
+        bookService.deleteById(id);
+        return ResponseEntity.ok("Removed book from db");
     }
 
     @GetMapping("/book/{isbn}")

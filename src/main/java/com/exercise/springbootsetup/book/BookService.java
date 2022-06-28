@@ -19,4 +19,10 @@ public interface BookService {
     Book externalToInternalBook(final com.exercise.springbootsetup.models.external.Book source);
 
     Optional<List<Book>> getBooks(Query filter) throws ServiceException;
+
+    Book save(Book book) throws ServiceException;
+
+    void deleteById(Long Id) throws ServiceException;
+
+    void validate(Query filter) throws ServiceException;
 }

@@ -4,6 +4,7 @@ import com.exercise.springbootsetup.author.Author;
 import com.exercise.springbootsetup.category.Category;
 import com.exercise.springbootsetup.exception.ServiceException;
 import com.exercise.springbootsetup.query.Query;
+import com.exercise.springbootsetup.query.QueryUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -78,9 +79,19 @@ public class BookServiceImpl implements BookService{
         return internalBook;
     }
 
-    // TODO: refactor to filterObject (of query object)
     @Override
-    public Optional<List<Book>> getBooks(Query filter) {
+    public Book save(Book book){
+
+        return bookRepository.save(book);
+    }
+
+    @Override
+    public void deleteById(Long id){
+        bookRepository.deleteById(id);
+    }
+
+    @Override
+    public Optional<List<Book>> getBooks(Query filter) throws ServiceException {
         return bookRepository.getBooks(filter);
     }
 
@@ -92,6 +103,17 @@ public class BookServiceImpl implements BookService{
             throw new ServiceException("Book not found: Check the ISBN, if correct the book doesn't exist in our DB");
         }
         return book;
+    }
+
+    //TODO: validate function - DONE
+    @Override
+    public void validate(Query filter) throws ServiceException {
+        if (StringUtils.isNotBlank(filter.getSortDir())){
+            QueryUtil.checkSortingDirection(filter.getSortDir());
+        }
+        if(StringUtils.isNotBlank(filter.getPublishedAfter())){
+            QueryUtil.checkZonedDateTime(filter.getPublishedAfter());
+        }
     }
 
     // TODO: refactor max 7 lijnen -> submethodes indien nodig (ctrl alt m) - DONE
@@ -149,6 +171,4 @@ public class BookServiceImpl implements BookService{
     private Optional<Category> getOptionalCategory(String category) {
         return categorySet.stream().filter(c -> c.getCategoryName().equalsIgnoreCase(category)).findFirst();
     }
-
-    //TODO: validate function
 }

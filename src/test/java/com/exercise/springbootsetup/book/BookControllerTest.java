@@ -3,7 +3,6 @@ package com.exercise.springbootsetup.book;
 import com.exercise.springbootsetup.AbstractTest;
 import com.exercise.springbootsetup.exception.ServiceException;
 import com.exercise.springbootsetup.query.Query;
-import com.exercise.springbootsetup.query.QueryServiceImpl;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,12 +17,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -43,9 +42,6 @@ class BookControllerTest extends AbstractTest {
 
     @Mock
     private BookServiceImpl bookService;
-
-    @Mock
-    private QueryServiceImpl queryService;
 
     @InjectMocks
     private BookController bookController;
@@ -67,8 +63,6 @@ class BookControllerTest extends AbstractTest {
     @Test
     public void getBooks() throws Exception {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-        when(queryService.createSort(null)).thenReturn(null);
-        when(queryService.createZonedDateTime(null)).thenReturn(null);
 
         String uri = "/api/book";
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
@@ -88,8 +82,6 @@ class BookControllerTest extends AbstractTest {
     @Test
     public void getBooks_sort_by_title_asc() throws Exception {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-        when(queryService.createSort("asc")).thenReturn("ASC");
-        when(queryService.createZonedDateTime(null)).thenReturn(null);
 
         String uri = "/api/book?sort=asc";
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
@@ -103,14 +95,12 @@ class BookControllerTest extends AbstractTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly("ASC", null);
+                .containsExactly("asc", null);
     }
 
     @Test
     public void getBooks_sort_by_title_desc() throws Exception {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-        when(queryService.createSort("desc")).thenReturn("DESC");
-        when(queryService.createZonedDateTime(null)).thenReturn(null);
 
         String uri = "/api/book?sort=desc";
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
@@ -124,14 +114,12 @@ class BookControllerTest extends AbstractTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly("DESC", null);
+                .containsExactly("desc", null);
     }
 
     @Test
     public void getBooks_sort_by_title_wrong_sort() throws Exception {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-        when(queryService.createSort(SORT_DIR_WRONG)).thenReturn(SORT_DIR_WRONG);
-        when(queryService.createZonedDateTime(null)).thenReturn(null);
 
         String uri = "/api/book?sort=jef";
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
@@ -153,8 +141,6 @@ class BookControllerTest extends AbstractTest {
     @Test
     public void getBooks_after_published_date() throws Exception {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-        when(queryService.createSort(null)).thenReturn(null);
-        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse(ZONED_DATE));
 
         String uri = "/api/book?publishedAfter=2011-04-01";
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
@@ -167,7 +153,7 @@ class BookControllerTest extends AbstractTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly(null, ZonedDateTime.parse(ZONED_DATE));
+                .containsExactly(null, DATE);
         assertThat(status).isEqualTo(200);
     }
 
@@ -191,8 +177,6 @@ class BookControllerTest extends AbstractTest {
     @Test
     public void getBooks_after_published_date_sort_by_title_asc() throws Exception {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-        when(queryService.createSort("asc")).thenReturn("ASC");
-        when(queryService.createZonedDateTime(DATE)).thenReturn(ZonedDateTime.parse(ZONED_DATE));
 
         String uri = "/api/book?publishedAfter=2014-06-03&sort=asc";
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
@@ -205,7 +189,7 @@ class BookControllerTest extends AbstractTest {
         assertThat(queryCaptor.getValue())
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
-                .containsExactly("ASC", ZonedDateTime.parse(ZONED_DATE));
+                .containsExactly("asc", DATE);
         assertThat(status).isEqualTo(200);
     }
 
