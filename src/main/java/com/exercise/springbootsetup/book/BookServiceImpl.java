@@ -34,6 +34,11 @@ public class BookServiceImpl implements BookService{
             .build();
 
     @Override
+    public List<Book> saveAll( String filePath) throws ServiceException {
+        return bookRepository.saveAll(this.getBooksFromFile(filePath));
+    }
+
+    @Override
     public List<Book> getBooksFromFile(final String filePath) throws ServiceException {
         try{
             if (StringUtils.isBlank(filePath)){
@@ -45,11 +50,13 @@ public class BookServiceImpl implements BookService{
         }
     }
 
+    // TODO: Make mapper -> out of service
     @Override
     public List<Book> externalToInternalBooks(List<com.exercise.springbootsetup.models.external.Book> source) {
         return source.stream().map(this::externalToInternalBook).collect(Collectors.toList());
     }
 
+    // TODO: Make mapper -> out of service
     @Override
     public Book externalToInternalBook(com.exercise.springbootsetup.models.external.Book source) {
         Book internalBook = null;
@@ -77,10 +84,6 @@ public class BookServiceImpl implements BookService{
         return bookRepository.getBooks(filter);
     }
 
-    @Override
-    public List<Book> saveAll( String filePath) throws ServiceException {
-        return bookRepository.saveAll(this.getBooksFromFile(filePath));
-    }
 
     @Override
     public Optional<Book> findBookByIsbn(String isbn) throws ServiceException{
@@ -91,47 +94,61 @@ public class BookServiceImpl implements BookService{
         return book;
     }
 
+    // TODO: refactor max 7 lijnen -> submethodes indien nodig (ctrl alt m) - DONE
     private Set<Author> getAuthor(List<String> authors){
-        Set<Author> bookAuthorSet = new HashSet<>();
+        Set<Author> authorSetPerBook = new HashSet<>();
 
         if(authors != null){
-            for (String author : authors) {
-                Optional<Author> possibleAuthor = authorSet.stream().filter(author1 -> author1.getFullName().equalsIgnoreCase(author)).findFirst();
-                if (possibleAuthor.isPresent()){
-                    bookAuthorSet.add(possibleAuthor.get());
-                }else {
-                    if (StringUtils.isNotBlank(author)){
-                        Author newAuthor = new Author(author);
-                        authorSet.add(newAuthor);
+            for (String authorName : authors) {
+                Optional<Author> possibleAuthor = getOptionalAuthor(authorName);
+                Author author = possibleAuthor.orElseGet(() -> createNewAuthor(authorName));
 
-                        bookAuthorSet.add(newAuthor);
-                    }
-                }
+                authorSetPerBook.add(author);
             }
         }
 
-        return bookAuthorSet;
+        return authorSetPerBook;
     }
 
+    private Author createNewAuthor( String authorName) {
+        Author newAuthor = null;
+        if (StringUtils.isNotBlank(authorName)){
+            newAuthor = new Author(authorName);
+            authorSet.add(newAuthor);
+        }
+        return newAuthor;
+    }
+
+    private Optional<Author> getOptionalAuthor(String author) {
+        return authorSet.stream().filter(author1 -> author1.getFullName().equalsIgnoreCase(author)).findFirst();
+    }
+
+    // TODO: refactor max 7 lijnen -> submethodes indien nodig (ctrl alt m) - DONE
     private Set<Category> getCategory(List<String> categories){
-        Set<Category> bookCategorySet = new HashSet<>();
+        Set<Category> categorySetPerBook = new HashSet<>();
 
         if(categories != null){
-            for (String category : categories) {
-                Optional<Category> possibleCategory = categorySet.stream().filter(c -> c.getCategoryName().equalsIgnoreCase(category)).findFirst();
-                if (possibleCategory.isPresent()){
-                    bookCategorySet.add(possibleCategory.get());
-                }else {
-                    if (StringUtils.isNotBlank(category)){
-                        Category newCategory = new Category(StringUtils.capitalize(category));
-                        categorySet.add(newCategory);
+            for (String categoryName : categories) {
+                Optional<Category> possibleCategory = getOptionalCategory(categoryName);
+                Category category = possibleCategory.orElseGet(() -> createNewCategory(categoryName));
 
-                        bookCategorySet.add(newCategory);
-                    }
-                }
+                categorySetPerBook.add(category);
             }
         }
 
-        return bookCategorySet;
+        return categorySetPerBook;
     }
+
+    private Category createNewCategory(String categoryName) {
+        Category newCategory = new Category(StringUtils.capitalize(categoryName));
+        categorySet.add(newCategory);
+
+        return newCategory;
+    }
+
+    private Optional<Category> getOptionalCategory(String category) {
+        return categorySet.stream().filter(c -> c.getCategoryName().equalsIgnoreCase(category)).findFirst();
+    }
+
+    //TODO: validate function
 }
