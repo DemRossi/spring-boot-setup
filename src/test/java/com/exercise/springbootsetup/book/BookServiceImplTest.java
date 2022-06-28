@@ -30,7 +30,6 @@ class BookServiceImplTest {
     final String DATE = "2011-04-01";
     final String ZONED_DATE = "2011-04-01T00:00+02:00[Europe/Paris]";
 
-
     @Mock
     private BookRepository bookRepository;
 
@@ -42,8 +41,6 @@ class BookServiceImplTest {
 
     BookServiceImplTest() {
     }
-
-    // TODO: Verify gebruiken
 
     @Test
     void getBooksFromFile() throws ServiceException {
@@ -84,9 +81,32 @@ class BookServiceImplTest {
     }
 
     @Test
-    void findBookByIsbn(){
-        Optional<Book> book = bookRepository.findBookByIsbn("1234567890");
-        verify(bookRepository, times(1)).findBookByIsbn("1234567890");
+    void findBookByIsbn() throws ServiceException {
+        Query filter = mock(Query.class);
+        when(bookRepository.findBookByIsbn("1234567890")).thenReturn(Optional.of(mock(Book.class)));
+        when(filter.getIsbn()).thenReturn("1234567890");
+
+        Optional<Book> book = bookService.findBookByIsbn(filter);
+
+        verify(bookRepository, times(1)).findBookByIsbn(filter.getIsbn());
+    }
+
+    @Test
+    void findBookByIsbn_no_result() {
+        Query filter = mock(Query.class);
+        when(bookRepository.findBookByIsbn("1234567890")).thenReturn(Optional.empty());
+        when(filter.getIsbn()).thenReturn("1234567890");
+
+        Exception exception = assertThrows(ServiceException.class, () -> {
+            Optional<Book> book = bookService.findBookByIsbn(filter);
+        });
+
+        String expectedMessage = "Book not found: Check the ISBN, if correct the book doesn't exist in our DB";
+        String actualMessage = exception.getMessage();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+
+        verify(bookRepository, times(1)).findBookByIsbn(filter.getIsbn());
     }
 
     @Test

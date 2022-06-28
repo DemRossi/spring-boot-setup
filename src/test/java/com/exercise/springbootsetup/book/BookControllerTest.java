@@ -211,11 +211,17 @@ class BookControllerTest extends AbstractTest {
 
     @Test
     public void getBookByIsbn() throws Exception {
+        ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
         ResponseEntity<Optional<Book>> getBookResponse = bookController.getBookByIsbn("123456789");
+
         int status = getBookResponse.getStatusCodeValue();
 
-        verify(bookService, times(1)).findBookByIsbn("123456789");
+        verify(bookService, times(1)).findBookByIsbn(queryCaptor.capture());
         assertThat(status).isEqualTo(200);
+        assertThat(queryCaptor.getValue())
+                .isNotNull()
+                .extracting(Query::getSortDir, Query::getPublishedAfter, Query::getIsbn)
+                .containsExactly(null, null, "123456789");
     }
 
 }
