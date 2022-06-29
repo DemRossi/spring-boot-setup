@@ -17,14 +17,6 @@ public class BookController {
     @Autowired
     private BookServiceImpl bookService;
 
-    @GetMapping ("/import-books")
-    public ResponseEntity<List<Book>> saveBooks() throws ServiceException {
-        // Import data: this case file -> could be api!
-        final String JSON_PATH = "src/main/resources/files/books.json";
-        List<Book> books = bookService.saveAll(JSON_PATH);
-        return new ResponseEntity<>(books, HttpStatus.CREATED);
-    }
-
     @GetMapping("/book")
     public ResponseEntity<Optional<List<Book>>> getBooks(
             @RequestParam(value = "sort", required = false) String sortDir,
@@ -38,21 +30,21 @@ public class BookController {
         return new ResponseEntity<>(bookService.getBooks(filter), HttpStatus.OK);
     }
 
-    @PostMapping("/book")
-    public ResponseEntity<Book> saveBook( @RequestBody Book book ){
-        // TODO: met Query Object??
-        //TODO: check if author exist, yes -> use author, no -> make author. Idem categories
-        Book newBook = bookService.save(book);
-        return ResponseEntity.created(URI.create(String.format("/book/%s", book.getIsbn())))
-                .body(newBook);
-    }
-
-    @DeleteMapping("/book/{id}")
-    public ResponseEntity<String>  deleteBook(@PathVariable Long id) {
-        // TODO: met Query Object
-        bookService.deleteById(id);
-        return ResponseEntity.ok("Removed book from db");
-    }
+//    @PostMapping("/book")
+//    public ResponseEntity<Book> saveBook( @RequestBody Book book ){
+//        // TODO: met Query Object??
+//        //TODO: check if author exist, yes -> use author, no -> make author. Idem categories
+//        Book newBook = bookService.save(book);
+//        return ResponseEntity.created(URI.create(String.format("/book/%s", book.getIsbn())))
+//                .body(newBook);
+//    }
+//
+//    @DeleteMapping("/book/{id}")
+//    public ResponseEntity<String>  deleteBook(@PathVariable Long id) {
+//        // TODO: met Query Object
+//        bookService.deleteById(id);
+//        return ResponseEntity.ok("Removed book from db");
+//    }
 
     @GetMapping("/book/{isbn}")
     public ResponseEntity<Optional<Book>> getBookByIsbn(@PathVariable String isbn) throws ServiceException {

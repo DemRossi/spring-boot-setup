@@ -1,7 +1,6 @@
 package com.exercise.springbootsetup.book;
 
 import com.exercise.springbootsetup.AbstractTest;
-import com.exercise.springbootsetup.exception.ServiceException;
 import com.exercise.springbootsetup.query.Query;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,11 +26,9 @@ import static org.mockito.Mockito.verify;
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class BookControllerTest extends AbstractTest {
-    final String JSON_PATH = "src/main/resources/files/books.json";
     final String SORT_DIR_WRONG = "JEFF";
     final String DATE = "2011-04-01";
     final String NOT_DATE = "qwerty";
-    final String ZONED_DATE = "2011-04-01T00:00+02:00[Europe/Paris]";
 
     @Override
     @Before
@@ -47,18 +43,6 @@ class BookControllerTest extends AbstractTest {
     private BookController bookController;
 
     // TODO: Virify gebruiken
-
-    @Test
-    public void saveBooks() throws ServiceException {
-        ResponseEntity<List<Book>> savedBooksResponse = bookController.saveBooks();
-        int content = savedBooksResponse.getStatusCodeValue();
-
-        assertThat(content).isNotNull();
-        assertThat(content).isEqualTo(201);
-        assertThat(savedBooksResponse.getBody()).isNotNull();
-        verify(bookService, times(1)).saveAll(JSON_PATH);
-
-    }
 
     @Test
     public void getBooks() throws Exception {

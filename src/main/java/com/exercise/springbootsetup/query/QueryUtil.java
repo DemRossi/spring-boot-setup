@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public final class QueryUtil{
-    final static String GENERAL_EXCEPTION_MESSAGE = "Exception while getting books: ";
+    final static String WHILE_GETTING_BOOKS_EXCEPTION = "Exception while getting books: ";
 
     // TODO: naar QueryUtil - DONE
     public static void checkSortingDirection(String sortDir) throws ServiceException {
@@ -19,7 +19,7 @@ public final class QueryUtil{
                 throw new IllegalArgumentException("Sort parameter can only be asc or desc");
             }
         }catch (Exception e){
-            throw new ServiceException(GENERAL_EXCEPTION_MESSAGE + e.getMessage(), e);
+            throw new ServiceException(WHILE_GETTING_BOOKS_EXCEPTION + e.getMessage(), e);
         }
     }
 
@@ -29,7 +29,7 @@ public final class QueryUtil{
                 throw new IllegalArgumentException("Something is wrong with the date format");
             }
         }catch(Exception e){
-            throw new ServiceException(GENERAL_EXCEPTION_MESSAGE + e.getMessage(), e);
+            throw new ServiceException(WHILE_GETTING_BOOKS_EXCEPTION + e.getMessage(), e);
         }
     }
 
@@ -39,5 +39,19 @@ public final class QueryUtil{
         LocalDate localDate = LocalDate.parse(date, formatter);
 
         return localDate.atStartOfDay(ZoneId.systemDefault());
+    }
+
+    public static void checkFilePath(final String filePath) throws ServiceException {
+        try{
+            if(!StringUtils.containsAny(filePath, "/")){
+                throw new IllegalArgumentException("Invalid path");
+            }
+            if (!StringUtils.endsWith(filePath, ".json")){
+                throw new IllegalArgumentException("Given file isn't a json");
+            }
+        }catch (Exception e){
+            throw new ServiceException("Something is wrong with the file path: " + e.getMessage(), e);
+        }
+
     }
 }

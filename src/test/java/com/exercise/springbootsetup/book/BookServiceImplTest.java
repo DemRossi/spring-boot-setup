@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceImplTest {
-    final static String JSON_PATH = "src/test/resources/file/test_json.json";
     final String DATE = "2011-04-01";
 
     @Mock
@@ -30,44 +29,6 @@ class BookServiceImplTest {
     private BookServiceImpl bookService;
 
     BookServiceImplTest() {
-    }
-
-    @Test
-    void getBooksFromFile() throws ServiceException {
-        List<Book> importedBookList = bookService.getBooksFromFile(JSON_PATH);
-
-        assertThat(importedBookList).isNotNull();
-    }
-
-    @Test
-    void getBooksFromFile_null() {
-        Exception exception = assertThrows(ServiceException.class, () -> {
-            List<Book> importedBookList = bookService.getBooksFromFile(null);
-        });
-
-        String expectedMessage = "No path given";
-        String actualMessage = exception.getMessage();
-
-        Assertions.assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    @Test
-    void getBooksFromFile_wrong_path() {
-        Exception exception = assertThrows(ServiceException.class, () -> {
-            List<Book> importedBookList = bookService.getBooksFromFile("wrong/path/to/file.json");
-        });
-
-        String expectedMessage = "Exception while retrieving books from file:";
-        String actualMessage = exception.getMessage();
-
-        Assertions.assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    @Test
-    void saveAll() throws ServiceException {
-        List<Book> savedBooks = bookService.saveAll(JSON_PATH);
-
-        verify(bookRepository, times(1)).saveAll(bookService.getBooksFromFile(JSON_PATH));
     }
 
     @Test

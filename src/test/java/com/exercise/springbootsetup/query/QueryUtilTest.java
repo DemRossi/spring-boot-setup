@@ -18,6 +18,9 @@ class QueryUtilTest {
     final String WRONG_FORMAT_DATE = "2011-30-01";
     final String NOT_DATE = "qwerty";
     final String ZONED_DATE = "2011-04-01T00:00+02:00[Europe/Paris]";
+    final String JSON_PATH = "src/test/resources/file/test_json.json";
+    final String HTML_PATH = "src/test/resources/file/test_json.html";
+    final String NO_SEPARATOR_PATH = "srctestresourcesfiletest_json.html";
 
     @Test
     void checkSortingDirection_asc() {
@@ -65,6 +68,35 @@ class QueryUtilTest {
         });
 
         String expectedMessage = "Something is wrong with the date format";
+        String actualMessage = exception.getMessage();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void checkFilePath_expect_correct(){
+        assertDoesNotThrow(() -> QueryUtil.checkFilePath(JSON_PATH));
+    }
+
+    @Test
+    void checkFilePath_not_a_json_expect_error() {
+        Exception exception = assertThrows(ServiceException.class, () ->
+                QueryUtil.checkFilePath(HTML_PATH)
+        );
+
+        String expectedMessage = "Given file isn't a json";
+        String actualMessage = exception.getMessage();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void checkFilePath_no_separators_expect_error() {
+        Exception exception = assertThrows(ServiceException.class, () ->
+                QueryUtil.checkFilePath(NO_SEPARATOR_PATH)
+        );
+
+        String expectedMessage = "Invalid path";
         String actualMessage = exception.getMessage();
 
         Assertions.assertTrue(actualMessage.contains(expectedMessage));

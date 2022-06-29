@@ -18,7 +18,6 @@ public class BookMapperImpl implements BookMapper{
 
     // TODO: Make mapper -> out of service
     @Override
-
     public List<Book> externalToInternalBooks(List<com.exercise.springbootsetup.book.external.Book> source) {
         return source.stream().map(this::externalToInternalBook).collect(Collectors.toList());
     }
