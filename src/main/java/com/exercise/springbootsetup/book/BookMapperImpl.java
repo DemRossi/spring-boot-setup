@@ -90,8 +90,11 @@ public class BookMapperImpl implements BookMapper{
     }
 
     private Category createNewCategory(String categoryName) {
-        Category newCategory = new Category(StringUtils.capitalize(categoryName));
-        categorySet.add(newCategory);
+        Category newCategory = null;
+        if (StringUtils.isNotBlank(categoryName)) {
+            newCategory = new Category(StringUtils.capitalize(categoryName));
+            categorySet.add(newCategory);
+        }
 
         return newCategory;
     }

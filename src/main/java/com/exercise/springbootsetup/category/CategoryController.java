@@ -16,6 +16,6 @@ public class CategoryController {
 
     @GetMapping("/category")
     public Map<String, Long> getAuthorsWithAmountOfBooks(){
-        return categoryService.getCategoriesWithAmountOfBooks();
+        return categoryService.getCategoryAndAmountOfBooks();
     }
 }
