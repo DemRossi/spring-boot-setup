@@ -19,11 +19,17 @@ class AuthorServiceImplTest {
     @Mock
     AuthorRepository authorRepository;
 
+    @Mock
+    AuthorCountDTO dto1;
+
+    @Mock
+    AuthorCountDTO dto2;
+
     @InjectMocks
     AuthorServiceImpl authorService;
 
     @Test
-    void getAuthorsWithAmountOfBooks() {
+    void getAuthorAndAmountOfBooks() {
         Map<String, Long> authorBookCountMap = authorService.getAuthorAndAmountOfBooks();
 
         verify(authorRepository, times(1)).getAuthorAndAmountOfBooks();
@@ -31,22 +37,25 @@ class AuthorServiceImplTest {
     }
 
     @Test
-    void getAuthorsWithAmountOfBooks_with_lists() {
-        AuthorCountDTO dto1 = new AuthorCountDTO("Wes", 1L);
-        AuthorCountDTO dto2 = new AuthorCountDTO("Jef", 2L);
+    void getAuthorAndAmountOfBooks_with_list_expect_map() {
+        when(dto1.getFullName()).thenReturn("Wes");
+        when(dto1.getBookCount()).thenReturn(1L);
+
+        when(dto2.getFullName()).thenReturn("Jef");
+        when(dto2.getBookCount()).thenReturn(2L);
 
         List<AuthorCountDTO> dtoList = new ArrayList<>();
-        List<AuthorCountDTO> spyDtoList = Mockito.spy(dtoList);
 
-        spyDtoList.add(dto1);
-        spyDtoList.add(dto2);
+        dtoList.add(dto1);
+        dtoList.add(dto2);
 
-        when(authorRepository.getAuthorAndAmountOfBooks()).thenReturn(spyDtoList);
+        when(authorRepository.getAuthorAndAmountOfBooks()).thenReturn(dtoList);
 
         Map<String, Long> authorBookCountMap = authorService.getAuthorAndAmountOfBooks();
 
         assertThat(authorBookCountMap).isNotNull();
         assertThat(authorBookCountMap).isNotEmpty();
         assertThat(authorBookCountMap.size()).isEqualTo(2);
+        assertThat(authorBookCountMap.get("Wes")).isEqualTo(1L);
     }
 }

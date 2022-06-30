@@ -13,8 +13,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,12 +36,19 @@ class AuthorControllerTest extends AbstractTest {
     private AuthorController authorController;
 
     @Test
-    void getAuthorsWithAmountOfBooks() throws Exception {
+    void getAuthorAndAmountOfBooks_api_call_expect_200() throws Exception {
         String uri = "/api/author";
         MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.get(uri)
                 .accept(MediaType.APPLICATION_JSON)).andReturn();
 
         int status = mvcResult.getResponse().getStatus();
         assertThat(status).isEqualTo(200);
+    }
+
+    @Test
+    void getAuthorAndAmountOfBooks_author_service_call_expect_1_call() {
+        Map<String, Long> authorsAndBookCount = authorController.getAuthorsWithAmountOfBooks();
+
+        verify(authorService, times(1)).getAuthorAndAmountOfBooks();
     }
 }
