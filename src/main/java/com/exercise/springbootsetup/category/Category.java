@@ -3,6 +3,7 @@ package com.exercise.springbootsetup.category;
 import lombok.Getter;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
 @Entity
@@ -20,4 +21,9 @@ public class Category {
     private Long id;
 
     private String categoryName;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(categoryName);
+    }
 }
