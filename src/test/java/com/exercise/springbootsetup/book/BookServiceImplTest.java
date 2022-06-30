@@ -38,8 +38,12 @@ class BookServiceImplTest {
         when(filter.getIsbn()).thenReturn("1234567890");
 
         Optional<Book> book = bookService.findBookByIsbn(filter);
+        when(book.get().getId()).thenReturn(1L);
+        when(book.get().getIsbn()).thenReturn("1234567890");
 
         verify(bookRepository, times(1)).findBookByIsbn(filter.getIsbn());
+        assertThat(book.get().getId()).isEqualTo(1L);
+        assertThat(book.get().getIsbn()).isEqualTo("1234567890");
     }
 
     @Test
