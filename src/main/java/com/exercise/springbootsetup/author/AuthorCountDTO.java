@@ -1,11 +1,9 @@
 package com.exercise.springbootsetup.author;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@Data
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
 public class AuthorCountDTO {
     private String fullName;

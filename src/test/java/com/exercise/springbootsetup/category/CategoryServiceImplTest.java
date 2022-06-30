@@ -1,12 +1,10 @@
 package com.exercise.springbootsetup.category;
 
-import com.exercise.springbootsetup.bookCategory.BookCategory;
-import com.exercise.springbootsetup.bookCategory.BookCategoryServiceImpl;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -21,72 +19,30 @@ class CategoryServiceImplTest {
     @Mock
     CategoryRepository categoryRepository;
 
-    @Mock
-    BookCategoryServiceImpl bookCategoryService;
-
     @InjectMocks
     CategoryServiceImpl categoryService;
 
-    static List<Category> categories = new ArrayList<>();
-    static List<BookCategory> bookCategories = new ArrayList<>();
-
-    @BeforeAll
-    public static void setup(){
-        Category c1 = new Category();
-        c1.setId(1L);
-        c1.setCategoryName("Internet");
-
-        Category c2 = new Category();
-        c2.setId(2L);
-        c2.setCategoryName("Java");
-
-        BookCategory ba1 = BookCategory.builder()
-                .category_id(1L)
-                .book_id(5L)
-                .build();
-
-        BookCategory ba2 = BookCategory.builder()
-                .category_id(1L)
-                .book_id(7L)
-                .build();
-
-        BookCategory ba3 = BookCategory.builder()
-                .category_id(2L)
-                .book_id(6L)
-                .build();
-        BookCategory ba4 = BookCategory.builder()
-                .category_id(1L)
-                .book_id(8L)
-                .build();
-        BookCategory ba5 = BookCategory.builder()
-                .category_id(2L)
-                .book_id(8L)
-                .build();
-
-        categories.add(c1);
-        categories.add(c2);
-
-        bookCategories.add(ba1);
-        bookCategories.add(ba2);
-        bookCategories.add(ba3);
-        bookCategories.add(ba4);
-        bookCategories.add(ba5);
-    }
-
     @Test
     void getCategoriesWithAmountOfBooks() {
-        Map<String, Long> categoryBookCountMap = categoryService.getCategoriesWithAmountOfBooks();
+        Map<String, Long> categoryBookCountMap = categoryService.getCategoryAndAmountOfBooks();
 
         assertThat(categoryBookCountMap).isNotNull();
-        verify(categoryRepository, times(1)).findAll();
-        verify(bookCategoryService, times(1)).getBookCategories();
+        verify(categoryRepository, times(1)).getCategoryAndAmountOfBooks();
     }
 
     @Test
-    void etCategoriesWithAmountOfBooks_with_lists() {
-        when(categoryRepository.findAll()).thenReturn(categories);
-        when(bookCategoryService.getBookCategories()).thenReturn(bookCategories);
-        Map<String, Long> authorBookCountMap = categoryService.getCategoriesWithAmountOfBooks();
+    void getCategoriesWithAmountOfBooks_with_lists() {
+        CategoryCountDTO dto1 = new CategoryCountDTO("test", 1L);
+        CategoryCountDTO dto2 = new CategoryCountDTO("Anders", 2L);
+        List<CategoryCountDTO> dtoList = new ArrayList<>();
+        List<CategoryCountDTO> spyDtoList = Mockito.spy(dtoList);
+
+        spyDtoList.add(dto1);
+        spyDtoList.add(dto2);
+
+        when(categoryRepository.getCategoryAndAmountOfBooks()).thenReturn(spyDtoList);
+
+        Map<String, Long> authorBookCountMap = categoryService.getCategoryAndAmountOfBooks();
 
         assertThat(authorBookCountMap).isNotNull();
         assertThat(authorBookCountMap).isNotEmpty();

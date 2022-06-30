@@ -7,7 +7,6 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Getter
-@Setter
 @Entity
 public class Author {
     public Author(){}
