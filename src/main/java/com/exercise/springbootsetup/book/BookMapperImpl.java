@@ -16,13 +16,13 @@ public class BookMapperImpl implements BookMapper{
     private final Set<Author> authorSet = new HashSet<>();
     private final Set<Category> categorySet = new HashSet<>();
 
-    // TODO: Make mapper -> out of service
+    // TODO: Make mapper -> out of service - DONE
     @Override
     public List<Book> externalToInternalBooks(List<com.exercise.springbootsetup.book.external.Book> source) {
         return source.stream().map(this::externalToInternalBook).collect(Collectors.toList());
     }
 
-    // TODO: Make mapper -> out of service
+    // TODO: Make mapper -> out of service - DONE
     @Override
     public Book externalToInternalBook(com.exercise.springbootsetup.book.external.Book source) {
         Book internalBook = null;
