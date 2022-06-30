@@ -7,7 +7,6 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import java.io.Serializable;
 
-//@Data
 @Getter
 @Builder
 @NoArgsConstructor

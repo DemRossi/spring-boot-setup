@@ -13,6 +13,7 @@ public class CustomizedBookRepositoryImpl implements CustomizedBookRepository{
     @PersistenceContext
     EntityManager entityManager;
 
+    // TODO: write test - DONE
     @Override
     public Optional<List<Book>> getBooks(Query filter) throws ServiceException {
         StringBuilder queryString = new StringBuilder("select b from Book b");

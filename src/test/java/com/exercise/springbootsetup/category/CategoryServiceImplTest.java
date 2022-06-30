@@ -19,6 +19,12 @@ class CategoryServiceImplTest {
     @Mock
     CategoryRepository categoryRepository;
 
+    @Mock
+    CategoryCountDTO dto1;
+
+    @Mock
+    CategoryCountDTO dto2;
+
     @InjectMocks
     CategoryServiceImpl categoryService;
 
@@ -32,15 +38,18 @@ class CategoryServiceImplTest {
 
     @Test
     void getCategoriesWithAmountOfBooks_with_lists() {
-        CategoryCountDTO dto1 = new CategoryCountDTO("test", 1L);
-        CategoryCountDTO dto2 = new CategoryCountDTO("Anders", 2L);
+        when(dto1.getCategoryName()).thenReturn("Java");
+        when(dto1.getBookCount()).thenReturn(1L);
+
+        when(dto2.getCategoryName()).thenReturn("Spring Boot");
+        when(dto2.getBookCount()).thenReturn(2L);
+
         List<CategoryCountDTO> dtoList = new ArrayList<>();
-        List<CategoryCountDTO> spyDtoList = Mockito.spy(dtoList);
 
-        spyDtoList.add(dto1);
-        spyDtoList.add(dto2);
+        dtoList.add(dto1);
+        dtoList.add(dto2);
 
-        when(categoryRepository.getCategoryAndAmountOfBooks()).thenReturn(spyDtoList);
+        when(categoryRepository.getCategoryAndAmountOfBooks()).thenReturn(dtoList);
 
         Map<String, Long> authorBookCountMap = categoryService.getCategoryAndAmountOfBooks();
 
