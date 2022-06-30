@@ -64,10 +64,9 @@ class BookServiceImplTest {
     void getBooks_both_params_null() throws ServiceException {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
 
-        Query filter = Query.builder()
-                .sortDir(null)
-                .publishedAfter(null)
-                .build();
+        Query filter = mock(Query.class);
+        when(filter.getSortDir()).thenReturn(null);
+        when(filter.getPublishedAfter()).thenReturn(null);
 
         Optional<List<Book>> getBooks = bookService.getBooks(filter);
 
@@ -83,10 +82,9 @@ class BookServiceImplTest {
     void getBooks_sortDir_filled_in() throws ServiceException {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
 
-        Query filter = Query.builder()
-                .sortDir("asc")
-                .publishedAfter(null)
-                .build();
+        Query filter = mock(Query.class);
+        when(filter.getSortDir()).thenReturn("asc");
+        when(filter.getPublishedAfter()).thenReturn(null);
 
         Optional<List<Book>> getBooks = bookService.getBooks(filter);
 
@@ -96,18 +94,6 @@ class BookServiceImplTest {
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
                 .containsExactly("asc", null);
-    }
-
-    @Test
-    void getBooks_sortDir_filled_in_wrong() throws ServiceException {
-        Query filter = Query.builder()
-                .sortDir("qwerty")
-                .publishedAfter(null)
-                .build();
-
-        Optional<List<Book>> getBooks = bookService.getBooks(filter);
-
-        assertThat(getBooks).isEmpty();
     }
 
     @Test
@@ -130,24 +116,11 @@ class BookServiceImplTest {
     }
 
     @Test
-    void getBooks_date_filled_in_wrong() throws ServiceException {
-        Query filter = Query.builder()
-                .sortDir(null)
-                .publishedAfter("qwerty")
-                .build();
-
-        Optional<List<Book>> getBooks = bookService.getBooks( filter);
-        assertThat(getBooks).isEmpty();
-    }
-
-    @Test
     void getBooks_both_filled_in() throws ServiceException {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
-
-        Query filter = Query.builder()
-                .sortDir("asc")
-                .publishedAfter(DATE)
-                .build();
+        Query filter = mock(Query.class);
+        when(filter.getSortDir()).thenReturn("asc");
+        when(filter.getPublishedAfter()).thenReturn(DATE);
 
         Optional<List<Book>> getBooks = bookService.getBooks(filter);
 

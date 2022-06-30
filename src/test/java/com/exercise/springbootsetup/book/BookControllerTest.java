@@ -42,8 +42,7 @@ class BookControllerTest extends AbstractTest {
     @InjectMocks
     private BookController bookController;
 
-    // TODO: Virify gebruiken
-
+    // TODO: Verify gebruiken - DONE
     @Test
     public void getBooks() throws Exception {
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
@@ -191,5 +190,4 @@ class BookControllerTest extends AbstractTest {
                 .extracting(Query::getSortDir, Query::getPublishedAfter, Query::getIsbn)
                 .containsExactly(null, null, "123456789");
     }
-
 }

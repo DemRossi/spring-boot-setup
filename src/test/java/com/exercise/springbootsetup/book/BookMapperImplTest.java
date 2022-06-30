@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BookMapperImplTest {
@@ -25,25 +27,19 @@ class BookMapperImplTest {
         List<String> testList = Arrays.asList("tester", "test");
 
         List<com.exercise.springbootsetup.book.external.Book> externalBookList = new ArrayList<>();
-        com.exercise.springbootsetup.book.external.Book book1 = new com.exercise.springbootsetup.book.external.Book();
-        book1.setIsbn("1234567890");
-        book1.setTitle("titel");
-        book1.setPageCount(123);
-        book1.setPublishedDate(createZonedDateTime("2014-04-01"));
-        book1.setThumbnailUrl("www.whatever.be");
-        book1.setShortDescription("short");
-        book1.setLongDescription("Long");
-        book1.setStatus("published");
-        book1.setAuthors(testList);
-        book1.setCategories(testList);
+        com.exercise.springbootsetup.book.external.Book book1 = mock(com.exercise.springbootsetup.book.external.Book.class);
+        when(book1.getIsbn()).thenReturn("1234567890");
+        when(book1.getTitle()).thenReturn("titel");
+        when(book1.getPageCount()).thenReturn(123);
+        when(book1.getPublishedDate()).thenReturn(createZonedDateTime("2014-04-01"));
+        when(book1.getThumbnailUrl()).thenReturn("www.whatever.be");
+        when(book1.getShortDescription()).thenReturn("short");
+        when(book1.getLongDescription()).thenReturn("Long");
+        when(book1.getStatus()).thenReturn("published");
+        when(book1.getAuthors()).thenReturn(testList);
+        when(book1.getCategories()).thenReturn(testList);
 
-        com.exercise.springbootsetup.book.external.Book book2 = new com.exercise.springbootsetup.book.external.Book();
-        book2.setIsbn("0987654321");
-        book2.setTitle("Dit is een andere titel");
-        book2.setPageCount(456);
-        book2.setPublishedDate(createZonedDateTime("2011-01-11"));
-        book1.setAuthors(testList);
-        book1.setCategories(testList);
+        com.exercise.springbootsetup.book.external.Book book2 = mock(com.exercise.springbootsetup.book.external.Book.class);
 
         externalBookList.add(book1);
         externalBookList.add(book2);
@@ -66,11 +62,8 @@ class BookMapperImplTest {
 
     @Test
     void externalToInternalBook() {
-        com.exercise.springbootsetup.book.external.Book externalBook = new com.exercise.springbootsetup.book.external.Book();
-        externalBook.setIsbn("1234567890");
-        externalBook.setTitle("Dit is een titel");
-        externalBook.setPageCount(123);
-        externalBook.setPublishedDate(createZonedDateTime("2014-04-01"));
+        com.exercise.springbootsetup.book.external.Book externalBook = mock(com.exercise.springbootsetup.book.external.Book.class);
+        when(externalBook.getIsbn()).thenReturn("1234567890");
 
         Book internalBook = bookMapper.externalToInternalBook(externalBook);
 
