@@ -5,6 +5,7 @@ import com.exercise.springbootsetup.query.Query;
 import com.exercise.springbootsetup.query.QueryUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,14 +16,20 @@ public class BookServiceImpl implements BookService{
     @Autowired
     private BookRepository bookRepository;
 
-    @Override
-    public Book save(Book book){
-        return bookRepository.save(book);
-    }
+//    @Override
+//    public Book save(Book book){
+//        return bookRepository.save(book);
+//    }
+//
 
+    //TODO: ResponseEntity in controller ipv service laag - DONE
     @Override
-    public void deleteById(Long id){
-        bookRepository.deleteById(id);
+    public Optional<Book> deleteById(Query filter){
+        Optional<Book> bookToDelete = bookRepository.findById(filter.getId());
+        if (bookToDelete.isPresent()){
+            bookRepository.deleteById(filter.getId());
+        }
+        return bookToDelete;
     }
 
     @Override

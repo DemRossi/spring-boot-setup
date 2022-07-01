@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,19 +31,23 @@ public class BookController {
 
 //    @PostMapping("/book")
 //    public ResponseEntity<Book> saveBook( @RequestBody Book book ){
-//        // TODO: met Query Object??
 //        //TODO: check if author exist, yes -> use author, no -> make author. Idem categories
 //        Book newBook = bookService.save(book);
 //        return ResponseEntity.created(URI.create(String.format("/book/%s", book.getIsbn())))
 //                .body(newBook);
 //    }
 //
-//    @DeleteMapping("/book/{id}")
-//    public ResponseEntity<String>  deleteBook(@PathVariable Long id) {
-//        // TODO: met Query Object
-//        bookService.deleteById(id);
-//        return ResponseEntity.ok("Removed book from db");
-//    }
+
+    @DeleteMapping("/book/{id}")
+    public ResponseEntity<String> deleteBook(@PathVariable Long id){
+        // TODO: met Query Object - DONE
+        Query filter = Query.builder()
+                .id(id)
+                .build();
+        Optional<Book> deletedBook = bookService.deleteById(filter);
+        return deletedBook.map(book -> new ResponseEntity<>(String.format("Removed book with title: %s", book.getTitle()), HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(String.format("Book with ID %s not found!", filter.getId()), HttpStatus.NOT_FOUND));
+    }
 
     @GetMapping("/book/{isbn}")
     public ResponseEntity<Optional<Book>> getBookByIsbn(@PathVariable String isbn) throws ServiceException {

@@ -3,6 +3,7 @@ package com.exercise.springbootsetup.book;
 import com.exercise.springbootsetup.AbstractTest;
 import com.exercise.springbootsetup.query.Query;
 import org.junit.Before;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -19,8 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -175,6 +175,44 @@ class BookControllerTest extends AbstractTest {
                 .containsExactly("asc", DATE);
         assertThat(status).isEqualTo(200);
     }
+
+    @Test
+    public void deleteBook_correct_id_expect_book_removed_message(){
+        ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+
+        when(bookService.deleteById(queryCaptor.capture())).thenReturn(Optional.of(mock(Book.class)));
+        ResponseEntity<String> deleteBookResponse = bookController.deleteBook(1L);
+
+        verify(bookService, times(1)).deleteById(queryCaptor.capture());
+        assertThat(deleteBookResponse.getBody()).contains("Removed book with title:");
+        assertThat(deleteBookResponse.getStatusCodeValue()).isEqualTo(200);
+
+    }
+
+    @Test
+    public void deleteBook_correct_id_expect_book_not_found_message(){
+        ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
+
+        ResponseEntity<String> deleteBookResponse = bookController.deleteBook(1L);
+
+        verify(bookService, times(1)).deleteById(queryCaptor.capture());
+        assertThat(deleteBookResponse.getBody()).contains("Book with ID");
+        assertThat(deleteBookResponse.getStatusCodeValue()).isEqualTo(404);
+    }
+
+    @Test
+    public void deleteBook_incorrect_id_type_expect_exception() throws Exception {
+        String uri = "/api/book/bla";
+
+        MvcResult mvcResult = mvc.perform(MockMvcRequestBuilders.delete(uri)
+                .accept(MediaType.APPLICATION_JSON)).andReturn();
+
+        String expectedMessage = "Failed to convert value of type";
+        String actualMessage = mvcResult.getResponse().getContentAsString();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
 
     @Test
     public void getBookByIsbn() throws Exception {

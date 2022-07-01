@@ -32,36 +32,25 @@ class BookServiceImplTest {
     }
 
     @Test
-    void findBookByIsbn() throws ServiceException {
+    void deleteById_correct_id_expect_delete(){
         Query filter = mock(Query.class);
-        when(bookRepository.findBookByIsbn("1234567890")).thenReturn(Optional.of(mock(Book.class)));
-        when(filter.getIsbn()).thenReturn("1234567890");
+        when(filter.getId()).thenReturn(1L);
+        when(bookRepository.findById(filter.getId()))
+                .thenReturn(Optional.of(mock(Book.class)));
 
-        Optional<Book> book = bookService.findBookByIsbn(filter);
-        when(book.get().getId()).thenReturn(1L);
-        when(book.get().getIsbn()).thenReturn("1234567890");
+        Optional<Book> book = bookService.deleteById(filter);
 
-        verify(bookRepository, times(1)).findBookByIsbn(filter.getIsbn());
-        assertThat(book.get().getId()).isEqualTo(1L);
-        assertThat(book.get().getIsbn()).isEqualTo("1234567890");
+        assertThat(book.isPresent()).isTrue();
     }
 
     @Test
-    void findBookByIsbn_no_result() {
+    void deleteById_id_not_found_expect_empty_optional(){
         Query filter = mock(Query.class);
-        when(bookRepository.findBookByIsbn("1234567890")).thenReturn(Optional.empty());
-        when(filter.getIsbn()).thenReturn("1234567890");
+        when(filter.getId()).thenReturn(1L);
 
-        Exception exception = assertThrows(ServiceException.class, () -> {
-            Optional<Book> book = bookService.findBookByIsbn(filter);
-        });
+        Optional<Book> book = bookService.deleteById(filter);
 
-        String expectedMessage = "Book not found: Check the ISBN, if correct the book doesn't exist in our DB";
-        String actualMessage = exception.getMessage();
-
-        Assertions.assertTrue(actualMessage.contains(expectedMessage));
-
-        verify(bookRepository, times(1)).findBookByIsbn(filter.getIsbn());
+        assertThat(book.isPresent()).isFalse();
     }
 
     @Test
@@ -134,6 +123,39 @@ class BookServiceImplTest {
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter)
                 .containsExactly("asc", DATE);
+    }
+
+    @Test
+    void findBookByIsbn() throws ServiceException {
+        Query filter = mock(Query.class);
+        when(bookRepository.findBookByIsbn("1234567890")).thenReturn(Optional.of(mock(Book.class)));
+        when(filter.getIsbn()).thenReturn("1234567890");
+
+        Optional<Book> book = bookService.findBookByIsbn(filter);
+        when(book.get().getId()).thenReturn(1L);
+        when(book.get().getIsbn()).thenReturn("1234567890");
+
+        verify(bookRepository, times(1)).findBookByIsbn(filter.getIsbn());
+        assertThat(book.get().getId()).isEqualTo(1L);
+        assertThat(book.get().getIsbn()).isEqualTo("1234567890");
+    }
+
+    @Test
+    void findBookByIsbn_no_result() {
+        Query filter = mock(Query.class);
+        when(bookRepository.findBookByIsbn("1234567890")).thenReturn(Optional.empty());
+        when(filter.getIsbn()).thenReturn("1234567890");
+
+        Exception exception = assertThrows(ServiceException.class, () -> {
+            Optional<Book> book = bookService.findBookByIsbn(filter);
+        });
+
+        String expectedMessage = "Book not found: Check the ISBN, if correct the book doesn't exist in our DB";
+        String actualMessage = exception.getMessage();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+
+        verify(bookRepository, times(1)).findBookByIsbn(filter.getIsbn());
     }
 
     @Test

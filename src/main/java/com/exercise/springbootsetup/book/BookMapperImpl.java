@@ -50,7 +50,7 @@ public class BookMapperImpl implements BookMapper{
 
         if(authors != null){
             for (String authorName : authors) {
-                Optional<Author> possibleAuthor = getOptionalAuthor(authorName);
+                Optional<Author> possibleAuthor = getAuthorFromCache(authorName);
                 Author author = possibleAuthor.orElseGet(() -> createNewAuthor(authorName));
 
                 authorSetPerBook.add(author);
@@ -69,8 +69,8 @@ public class BookMapperImpl implements BookMapper{
         return newAuthor;
     }
 
-    private Optional<Author> getOptionalAuthor(String author) {
-        return authorSet.stream().filter(author1 -> author1.getFullName().equalsIgnoreCase(author)).findFirst();
+    private Optional<Author> getAuthorFromCache(String fullName) {
+        return authorSet.stream().filter(author1 -> author1.getFullName().equalsIgnoreCase(fullName)).findFirst();
     }
 
     // TODO: refactor max 7 lijnen -> submethodes indien nodig (ctrl alt m) - DONE
@@ -79,7 +79,7 @@ public class BookMapperImpl implements BookMapper{
 
         if(categories != null){
             for (String categoryName : categories) {
-                Optional<Category> possibleCategory = getOptionalCategory(categoryName);
+                Optional<Category> possibleCategory = getCategoryFromCache(categoryName);
                 Category category = possibleCategory.orElseGet(() -> createNewCategory(categoryName));
 
                 categorySetPerBook.add(category);
@@ -99,7 +99,7 @@ public class BookMapperImpl implements BookMapper{
         return newCategory;
     }
 
-    private Optional<Category> getOptionalCategory(String category) {
-        return categorySet.stream().filter(c -> c.getCategoryName().equalsIgnoreCase(category)).findFirst();
+    private Optional<Category> getCategoryFromCache(String categoryName) {
+        return categorySet.stream().filter(c -> c.getCategoryName().equalsIgnoreCase(categoryName)).findFirst();
     }
 }
