@@ -2,6 +2,8 @@ package com.exercise.springbootsetup.book;
 
 import com.exercise.springbootsetup.author.Author;
 import com.exercise.springbootsetup.author.AuthorRepository;
+import com.exercise.springbootsetup.category.Category;
+import com.exercise.springbootsetup.category.CategoryRepository;
 import com.exercise.springbootsetup.exception.ServiceException;
 import com.exercise.springbootsetup.query.Query;
 import com.exercise.springbootsetup.query.QueryUtil;
@@ -22,35 +24,14 @@ public class BookServiceImpl implements BookService{
     @Autowired
     private AuthorRepository authorRepository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Override
     public Book save(Book book){
-        book.setAuthors(rebuildAuthorsFromBody(book));
-        return bookRepository.save(book);
+        // TODO: check if isbn exist
+        return bookRepository.save(rebuildAuthorsAndCategoriesFromBody(book));
     }
-
-    private Set<Author> rebuildAuthorsFromBody(Book book) {
-        Set<Author> authorCache = new HashSet<>();
-        Set<Author> bodyAuthors = book.getAuthors();
-
-        if(bodyAuthors != null){
-            checkForExistingAuthorsAndUseThem(bodyAuthors, authorCache);
-        }
-
-        return authorCache;
-    }
-
-    private void checkForExistingAuthorsAndUseThem(Set<Author> bodyAuthors, Set<Author> authorCache) {
-        for (Author bodyAuthor : bodyAuthors) {
-            Optional<Author> possibleExistingAuthor = authorRepository.findAuthorByFullName(bodyAuthor.getFullName());
-
-            if (possibleExistingAuthor.isPresent()){
-                authorCache.add(possibleExistingAuthor.get());
-            }else {
-                authorCache.add(bodyAuthor);
-            }
-        }
-    }
-
 
     //TODO: ResponseEntity in controller ipv service laag - DONE
     @Override
@@ -85,5 +66,49 @@ public class BookServiceImpl implements BookService{
         if(StringUtils.isNotBlank(filter.getPublishedAfter())){
             QueryUtil.checkZonedDateTime(filter.getPublishedAfter());
         }
+    }
+
+
+    private Book rebuildAuthorsAndCategoriesFromBody(Book book) {
+
+        if(book.getAuthors() != null){
+            book.setAuthors(checkForExistingAuthorsAndUseThem(book.getAuthors()));
+        }
+
+        if(book.getCategories() != null){
+            book.setCategories(checkForExistingCategoriesAndUseThem(book.getCategories()));
+        }
+
+        return book;
+    }
+
+    private Set<Author> checkForExistingAuthorsAndUseThem(Set<Author> bodyAuthors) {
+        Set<Author> authorCache = new HashSet<>();
+
+        for (Author bodyAuthor : bodyAuthors) {
+            Optional<Author> possibleExistingAuthor = authorRepository.findAuthorByFullName(bodyAuthor.getFullName());
+
+            if (possibleExistingAuthor.isPresent()){
+                authorCache.add(possibleExistingAuthor.get());
+            }else {
+                authorCache.add(bodyAuthor);
+            }
+        }
+        return authorCache;
+    }
+
+    private Set<Category> checkForExistingCategoriesAndUseThem(Set<Category> bodyCategories) {
+        Set<Category> categoryCache = new HashSet<>();
+
+        for (Category bodyCategory : bodyCategories) {
+            Optional<Category> possibleExistingCategory = categoryRepository.findCategoryByCategoryName(bodyCategory.getCategoryName());
+
+            if (possibleExistingCategory.isPresent()){
+                categoryCache.add(possibleExistingCategory.get());
+            }else {
+                categoryCache.add(bodyCategory);
+            }
+        }
+        return categoryCache;
     }
 }
