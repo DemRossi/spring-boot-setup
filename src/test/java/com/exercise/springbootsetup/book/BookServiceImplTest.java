@@ -1,5 +1,9 @@
 package com.exercise.springbootsetup.book;
 
+import com.exercise.springbootsetup.author.Author;
+import com.exercise.springbootsetup.author.AuthorRepository;
+import com.exercise.springbootsetup.category.Category;
+import com.exercise.springbootsetup.category.CategoryRepository;
 import com.exercise.springbootsetup.exception.ServiceException;
 import com.exercise.springbootsetup.query.Query;
 import org.junit.jupiter.api.Assertions;
@@ -8,10 +12,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -25,10 +32,146 @@ class BookServiceImplTest {
     @Mock
     private BookRepository bookRepository;
 
+    @Mock
+    private AuthorRepository authorRepository;
+
+    @Mock
+    private CategoryRepository categoryRepository;
+
     @InjectMocks
     private BookServiceImpl bookService;
 
     BookServiceImplTest() {
+    }
+
+    @Test
+    void save_with_new_isbn_expect_repository_called_once() throws ServiceException {
+        Book book = mock(Book.class);
+
+        when(book.getIsbn()).thenReturn("123345677890");
+        when(bookRepository.findBookByIsbn(book.getIsbn())).thenReturn(Optional.empty());
+        when(bookRepository.save(book)).thenReturn(book);
+
+        bookService.save(book);
+
+        verify(bookRepository, times(1)).save(book);
+    }
+
+    @Test
+    void save_with_existing_author_expect_saved_with_existing_author() throws ServiceException {
+        Book book = mock(Book.class);
+        Author bodyAuthor = mock(Author.class);
+        Author existingAuthor = mock(Author.class);
+
+        Set<Author> authors = new HashSet<>();
+        authors.add(bodyAuthor);
+
+        Set<Author> existingAuthors = new HashSet<>();
+        existingAuthors.add(existingAuthor);
+
+        when(book.getIsbn()).thenReturn("123345677890");
+        when(bookRepository.findBookByIsbn(book.getIsbn())).thenReturn(Optional.empty());
+        when(book.getAuthors()).thenReturn(authors);
+        when(bodyAuthor.getFullName()).thenReturn("tester");
+        when(authorRepository.findAuthorByFullName(bodyAuthor.getFullName())).thenReturn(Optional.of(existingAuthor));
+        when(bookRepository.save(book)).thenReturn(book);
+
+        Book savedBook = bookService.save(book);
+
+        when(savedBook.getAuthors()).thenReturn(existingAuthors);
+
+        verify(bookRepository, times(1)).save(book);
+        assertThat(savedBook.getAuthors()).contains(existingAuthor);
+    }
+
+    @Test
+    void save_with_new_author_expect_saved_with_new_author() throws ServiceException {
+        Book book = mock(Book.class);
+        Author bodyAuthor = mock(Author.class);
+
+        Set<Author> authors = new HashSet<>();
+        authors.add(bodyAuthor);
+
+        when(book.getIsbn()).thenReturn("123345677890");
+        when(bookRepository.findBookByIsbn(book.getIsbn())).thenReturn(Optional.empty());
+        when(book.getAuthors()).thenReturn(authors);
+        when(bodyAuthor.getFullName()).thenReturn("tester");
+        when(authorRepository.findAuthorByFullName(bodyAuthor.getFullName())).thenReturn(Optional.empty());
+        when(bookRepository.save(book)).thenReturn(book);
+
+        Book savedBook = bookService.save(book);
+
+        verify(bookRepository, times(1)).save(book);
+        assertThat(savedBook.getAuthors()).contains(bodyAuthor);
+    }
+
+    @Test
+    void save_with_existing_category_expect_saved_with_existing_category() throws ServiceException {
+        Book book = mock(Book.class);
+        Category bodyCategory = mock(Category.class);
+        Category existingCategory = mock(Category.class);
+
+        Set<Category> categories = new HashSet<>();
+        categories.add(bodyCategory);
+
+        Set<Category> existingCategories = new HashSet<>();
+        existingCategories.add(existingCategory);
+
+        when(book.getIsbn()).thenReturn("123345677890");
+        when(bookRepository.findBookByIsbn(book.getIsbn())).thenReturn(Optional.empty());
+
+        when(book.getCategories()).thenReturn(categories);
+        when(bodyCategory.getCategoryName()).thenReturn("tester");
+        when(categoryRepository.findCategoryByCategoryName(bodyCategory.getCategoryName())).thenReturn(Optional.of(existingCategory));
+
+        when(bookRepository.save(book)).thenReturn(book);
+
+        Book savedBook = bookService.save(book);
+
+        when(savedBook.getCategories()).thenReturn(existingCategories);
+
+        verify(bookRepository, times(1)).save(book);
+        assertThat(savedBook.getCategories()).contains(existingCategory);
+    }
+
+    @Test
+    void save_with_new_category_expect_saved_with_new_category() throws ServiceException {
+        Book book = mock(Book.class);
+        Category bodyCategory = mock(Category.class);
+
+        Set<Category> categories = new HashSet<>();
+        categories.add(bodyCategory);
+
+        when(book.getIsbn()).thenReturn("123345677890");
+        when(bookRepository.findBookByIsbn(book.getIsbn())).thenReturn(Optional.empty());
+
+        when(book.getCategories()).thenReturn(categories);
+        when(bodyCategory.getCategoryName()).thenReturn("tester");
+        when(categoryRepository.findCategoryByCategoryName(bodyCategory.getCategoryName())).thenReturn(Optional.empty());
+
+        when(bookRepository.save(book)).thenReturn(book);
+
+        Book savedBook = bookService.save(book);
+
+        verify(bookRepository, times(1)).save(book);
+        assertThat(savedBook.getCategories()).contains(bodyCategory);
+    }
+
+    @Test
+    void save_with_duplicate_isbn_expect_exception() {
+        Book book = mock(Book.class);
+
+        when(book.getIsbn()).thenReturn("1933988673");
+        when(bookRepository.findBookByIsbn(book.getIsbn())).thenReturn(Optional.of(book));
+
+        Exception exception = assertThrows(ServiceException.class, () ->
+            bookService.save(book)
+        );
+
+        String expectedMessage = "ISBN 1933988673 already exist in the database";
+        String actualMessage = exception.getMessage();
+
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test

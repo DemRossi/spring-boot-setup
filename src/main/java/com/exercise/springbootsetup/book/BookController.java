@@ -32,9 +32,9 @@ public class BookController {
 
     @PostMapping("/book")
     public ResponseEntity<Book> saveBook( @RequestBody Book book ) throws ServiceException {
-        Book newBook = bookService.save(book);
+        Book savedBook = bookService.save(book);
         return ResponseEntity.created(URI.create(String.format("/book/%s", book.getIsbn())))
-                .body(newBook);
+                .body(savedBook);
     }
 
 

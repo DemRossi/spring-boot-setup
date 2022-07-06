@@ -1,7 +1,9 @@
 package com.exercise.springbootsetup.book;
 
 import com.exercise.springbootsetup.AbstractTest;
+import com.exercise.springbootsetup.exception.ServiceException;
 import com.exercise.springbootsetup.query.Query;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -177,6 +179,16 @@ class BookControllerTest extends AbstractTest {
     }
 
     @Test
+    public void saveBook_with_correct_body_expect_book_saved() throws ServiceException {
+        Book book = mock(Book.class);
+
+        when(bookService.save(book)).thenReturn(book);
+        bookController.saveBook(book);
+
+        verify(bookService, times(1)).save(book);
+    }
+
+    @Test
     public void deleteBook_correct_id_expect_book_removed_message(){
         ArgumentCaptor<Query> queryCaptor = ArgumentCaptor.forClass(Query.class);
 
@@ -227,5 +239,13 @@ class BookControllerTest extends AbstractTest {
                 .isNotNull()
                 .extracting(Query::getSortDir, Query::getPublishedAfter, Query::getIsbn)
                 .containsExactly(null, null, "123456789");
+    }
+
+    public static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
