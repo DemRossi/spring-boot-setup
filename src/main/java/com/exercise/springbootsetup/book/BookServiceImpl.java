@@ -28,8 +28,11 @@ public class BookServiceImpl implements BookService{
     private CategoryRepository categoryRepository;
 
     @Override
-    public Book save(Book book){
-        // TODO: check if isbn exist
+    public Book save(Book book) throws ServiceException {
+        Optional<Book> isbnCheck = bookRepository.findBookByIsbn(book.getIsbn());
+        if(isbnCheck.isPresent()){
+            throw new ServiceException(String.format("ISBN %s already exist in the database", book.getIsbn()));
+        }
         return bookRepository.save(rebuildAuthorsAndCategoriesFromBody(book));
     }
 
