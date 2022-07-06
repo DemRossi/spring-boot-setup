@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,14 +30,13 @@ public class BookController {
         return new ResponseEntity<>(bookService.getBooks(filter), HttpStatus.OK);
     }
 
-//    @PostMapping("/book")
-//    public ResponseEntity<Book> saveBook( @RequestBody Book book ){
-//        //TODO: check if author exist, yes -> use author, no -> make author. Idem categories
-//        Book newBook = bookService.save(book);
-//        return ResponseEntity.created(URI.create(String.format("/book/%s", book.getIsbn())))
-//                .body(newBook);
-//    }
-//
+    @PostMapping("/book")
+    public ResponseEntity<Book> saveBook( @RequestBody Book book ){
+        Book newBook = bookService.save(book);
+        return ResponseEntity.created(URI.create(String.format("/book/%s", book.getIsbn())))
+                .body(newBook);
+    }
+
 
     @DeleteMapping("/book/{id}")
     public ResponseEntity<String> deleteBook(@PathVariable Long id){

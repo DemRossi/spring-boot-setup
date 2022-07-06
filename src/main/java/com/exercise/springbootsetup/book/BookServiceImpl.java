@@ -1,26 +1,56 @@
 package com.exercise.springbootsetup.book;
 
+import com.exercise.springbootsetup.author.Author;
+import com.exercise.springbootsetup.author.AuthorRepository;
 import com.exercise.springbootsetup.exception.ServiceException;
 import com.exercise.springbootsetup.query.Query;
 import com.exercise.springbootsetup.query.QueryUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service(" bookService")
 public class BookServiceImpl implements BookService{
     @Autowired
     private BookRepository bookRepository;
 
-//    @Override
-//    public Book save(Book book){
-//        return bookRepository.save(book);
-//    }
-//
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    @Override
+    public Book save(Book book){
+        book.setAuthors(rebuildAuthorsFromBody(book));
+        return bookRepository.save(book);
+    }
+
+    private Set<Author> rebuildAuthorsFromBody(Book book) {
+        Set<Author> authorCache = new HashSet<>();
+        Set<Author> bodyAuthors = book.getAuthors();
+
+        if(bodyAuthors != null){
+            checkForExistingAuthorsAndUseThem(bodyAuthors, authorCache);
+        }
+
+        return authorCache;
+    }
+
+    private void checkForExistingAuthorsAndUseThem(Set<Author> bodyAuthors, Set<Author> authorCache) {
+        for (Author bodyAuthor : bodyAuthors) {
+            Optional<Author> possibleExistingAuthor = authorRepository.findAuthorByFullName(bodyAuthor.getFullName());
+
+            if (possibleExistingAuthor.isPresent()){
+                authorCache.add(possibleExistingAuthor.get());
+            }else {
+                authorCache.add(bodyAuthor);
+            }
+        }
+    }
+
 
     //TODO: ResponseEntity in controller ipv service laag - DONE
     @Override

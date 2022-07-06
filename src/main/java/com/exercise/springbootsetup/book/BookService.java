@@ -12,7 +12,7 @@ public interface BookService {
 
     Optional<List<Book>> getBooks(Query filter) throws ServiceException;
 
-//    Book save(Book book) throws ServiceException;
+    Book save(Book book) throws ServiceException;
 
     Optional<Book> deleteById(Query filter) throws ServiceException;
 
