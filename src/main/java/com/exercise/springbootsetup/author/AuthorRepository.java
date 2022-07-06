@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Long> {
-    @Query("select new com.exercise.springbootsetup.author.AuthorCountDTO (a.fullName, count(ba.book_id)) from Author a left outer join book_author ba on a.id = ba.author_id group by a.id")
+    @Query(value = "select new com.exercise.springbootsetup.author.AuthorCountDTO (a.fullName, count(ba.book_id)) from Author a left outer join books_authors ba on a.id = ba.author_id group by a.id")
     List<AuthorCountDTO> getAuthorAndAmountOfBooks();
 }

@@ -1,4 +1,4 @@
-package com.exercise.springbootsetup.bookAuthor;
+package com.exercise.springbootsetup.booksAuthors;
 
 import lombok.*;
 
@@ -11,9 +11,9 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "book_author")
-@IdClass(BookAuthorPK.class)
-public class BookAuthor implements Serializable {
+@Entity(name = "books_authors")
+@IdClass(BooksAuthorsPK.class)
+public class BooksAuthors implements Serializable {
     @Id
     private Long book_id;
     @Id

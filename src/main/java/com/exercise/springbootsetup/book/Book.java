@@ -32,10 +32,10 @@ public class Book {
     private String status;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "book_author",
+    @JoinTable(name = "books_authors",
             joinColumns = { @JoinColumn(name = "book_id") },
             inverseJoinColumns = { @JoinColumn(name = "author_id") })
-    private Set<Author> author;
+    private Set<Author> authors;
 
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<Category> category;
