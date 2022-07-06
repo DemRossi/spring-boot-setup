@@ -1,4 +1,4 @@
-package com.exercise.springbootsetup.bookCategory;
+package com.exercise.springbootsetup.booksCategories;
 
 import lombok.*;
 
@@ -11,9 +11,9 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "book_category")
-@IdClass(BookCategoryPK.class)
-public class BookCategory implements Serializable {
+@Entity(name = "books_categories")
+@IdClass(BooksCategoriesPK.class)
+public class BooksCategories implements Serializable {
     @Id
     private Long book_id;
     @Id

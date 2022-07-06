@@ -38,7 +38,7 @@ public class BookMapperImpl implements BookMapper{
             internalBook.setLongDescription(source.getLongDescription());
             internalBook.setStatus(source.getStatus());
             internalBook.setAuthors(getAuthor(source.getAuthors()));
-            internalBook.setCategory(getCategory(source.getCategories()));
+            internalBook.setCategories(getCategory(source.getCategories()));
         }
 
         return internalBook;

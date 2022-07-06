@@ -56,8 +56,8 @@ class BookMapperImplTest {
         assertThat(internalBookList.get(0).getShortDescription()).isEqualTo("short");
         assertThat(internalBookList.get(0).getLongDescription()).isEqualTo("Long");
         assertThat(internalBookList.get(0).getStatus()).isEqualTo("published");
-        assertThat(internalBookList.get(0).getAuthor().size()).isEqualTo(2);
-        assertThat(internalBookList.get(0).getCategory().size()).isEqualTo(2);
+        assertThat(internalBookList.get(0).getAuthors().size()).isEqualTo(2);
+        assertThat(internalBookList.get(0).getCategories().size()).isEqualTo(2);
     }
 
     @Test

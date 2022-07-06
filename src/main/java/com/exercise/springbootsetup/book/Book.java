@@ -38,5 +38,8 @@ public class Book {
     private Set<Author> authors;
 
     @ManyToMany(cascade = CascadeType.ALL)
-    private Set<Category> category;
+    @JoinTable(name = "books_categories",
+            joinColumns = { @JoinColumn(name = "book_id") },
+            inverseJoinColumns = { @JoinColumn(name = "category_id") })
+    private Set<Category> categories;
 }
